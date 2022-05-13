@@ -1,0 +1,30 @@
+{
+    "name": "Toko Lancer",
+    "short_name": "Tokolancer",
+    "start_url": ".",
+    "background_color": "#f5f7fa",
+    "theme_color": "#36f763",
+    "display": "standalone",
+    "icons": [
+        {
+            "src": "img/logo/16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "img/logo/32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "img/logo/196.png",
+            "sizes": "196x196",
+            "type": "image/png"
+        },
+        {
+            "src": "img/logo/512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
