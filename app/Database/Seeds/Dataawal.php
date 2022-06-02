@@ -9,29 +9,6 @@ class Dataawal extends Seeder
 {
 	public function run()
 	{
-//		$datauser = [
-//			[
-//				'username' => 'admin',
-//				'email'    => 'ahmad.yani.ardath@gmail.com',
-//				'fullname' => 'naum admin',
-//				'password_hash' => '$2y$10$WlOA1F8P7Ae1IKfmbSRLzuXuEplWQOL/UMsV5cIJ7zUx4GrbmyNcG',
-//				'active' => 1,
-//				'force_pass_reset' => 0,
-//				'created_at' => Time::now('Asia/Jakarta', 'id_ID'),
-//				'updated_at' => Time::now('Asia/Jakarta', 'id_ID'),
-//			],
-//			[
-//				'username' => 'user',
-//				'email'    => 'abunaum@hotmail.com',
-//				'fullname' => 'naum user',
-//				'password_hash' => '$2y$10$WlOA1F8P7Ae1IKfmbSRLzuXuEplWQOL/UMsV5cIJ7zUx4GrbmyNcG',
-//				'active' => 1,
-//				'force_pass_reset' => 0,
-//				'created_at' => Time::now('Asia/Jakarta', 'id_ID'),
-//				'updated_at' => Time::now('Asia/Jakarta', 'id_ID'),
-//			],
-//		];
-//		$this->db->table('users')->insertBatch($datauser);
 		$dataapi = [
 			'apikey' => 'DEV-hIvWW2APKrWpEO68PXC4LWKhU3h4oBui23eJNJIr',
 			'apiprivatekey'    => 'qLlfi-VMwzL-nXVl0-bFPpa-bt6YS',
@@ -45,30 +22,6 @@ class Dataawal extends Seeder
 			'updated_at' => Time::now('Asia/Jakarta', 'id_ID')
 		];
 		$this->db->table('apipayment')->insert($dataapi);
-
-//		$dataauthgroup = [
-//			[
-//				'name' => 'admin',
-//				'description'    => 'Administrator',
-//			],
-//			[
-//				'name' => 'user',
-//				'description'    => 'User'
-//			]
-//		];
-//		$this->db->table('auth_groups')->insertBatch($dataauthgroup);
-//
-//		$data_auth_groups_users = [
-//			[
-//				'group_id' => 1,
-//				'user_id'    => 1,
-//			],
-//			[
-//				'group_id' => 2,
-//				'user_id'    => 2
-//			]
-//		];
-//		$this->db->table('auth_groups_users')->insertBatch($data_auth_groups_users);
 
 		$data_item = [
 			[
@@ -294,5 +247,6 @@ class Dataawal extends Seeder
 			]
 		];
 		$this->db->table('sub_item')->insertBatch($data_sub_item);
+
 	}
 }

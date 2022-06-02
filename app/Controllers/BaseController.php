@@ -56,7 +56,7 @@ class BaseController extends Controller
         $this->toko = new \App\Models\TokoModel();
         $this->transaksi_saldo = new \App\Models\TransaksiSaldoModel();
         $this->users = new \App\Models\User();
-        $this->role = new \App\Models\RoleModel();
+        $this->role = new \App\Models\Role();
         $this->apipayment = new \App\Models\ApiPaymentModel();
         $this->keranjang = new \App\Models\Keranjang();
         $this->invoice = new \App\Models\Invoice();

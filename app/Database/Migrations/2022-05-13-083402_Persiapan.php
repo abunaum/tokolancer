@@ -8,6 +8,9 @@ class Persiapan extends Migration
 {
     public function up()
     {
+        /*
+         * Users
+         */
         $this->forge->addField([
             'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
             'gauthid'            => ['type' => 'varchar', 'constraint' => 255],
@@ -28,6 +31,20 @@ class Persiapan extends Migration
         $this->forge->addUniqueKey('email');
 
         $this->forge->createTable('users', true);
+
+        /*
+         * role
+         */
+        $this->forge->addField([
+            'id'		=> ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+            'iduser'	 	=> ['type' => 'int', 'constraint' => 11, 'unsigned' => true],
+            'rules'	=> ['type' => 'varchar', 'constraint' => 255],
+        ]);
+
+        $this->forge->addKey('id', true);
+        $this->forge->addForeignKey('iduser', 'users', 'id', false, 'CASCADE');
+        $this->forge->createTable('role', true);
+
 
         /*
          * Apipayment
@@ -106,6 +123,7 @@ class Persiapan extends Migration
         ]);
 
         $this->forge->addKey('id', true);
+        $this->forge->addUniqueKey('username');
         $this->forge->addForeignKey('userid', 'users', 'id', false, 'CASCADE');
         $this->forge->createTable('toko', true);
 
@@ -206,6 +224,7 @@ class Persiapan extends Migration
             $this->forge->dropForeignKey('produk', 'produk_owner_foreign');
             $this->forge->dropForeignKey('keranjang', 'keranjang_buyer_foreign');
             $this->forge->dropForeignKey('keranjang', 'keranjang_produk_foreign');
+            $this->forge->dropForeignKey('users', 'users_role_foreign');
         }
 
         $this->forge->dropTable('users', true);
@@ -217,5 +236,6 @@ class Persiapan extends Migration
         $this->forge->dropTable('transaksi_saldo', true);
         $this->forge->dropTable('keranjang', true);
         $this->forge->dropTable('invoice', true);
+        $this->forge->dropTable('role', true);
     }
 }

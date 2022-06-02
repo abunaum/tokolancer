@@ -24,19 +24,16 @@
                             <?php foreach ($user as $user) : ?>
                                 <tr>
                                     <th scope="row"><?= $i++; ?></th>
-                                    <?php
-//                                    $db = \Config\Database::connect();
-//                                    $grup = $db->table('auth_groups_users');
-//                                    $grup->where('user_id', $user->id);
-//                                    $grup = $grup->get()->getFirstRow();
-//                                    $grupid = $grup->group_id;
-//                                    $carigrup = $db->table('auth_groups');
-//                                    $carigrup->where('id', $grupid);
-//                                    $carigrup = $carigrup->get()->getFirstRow();
-//                                    $namagrup = $carigrup->name;
-                                    ?>
                                     <td><?= $user['email']; ?></td>
-                                    <td>xxx</td>
+                                    <td>
+                                        <?php
+                                        if($user['status_toko'] == 4){
+                                           echo 'Active';
+                                        } else {
+                                            echo 'Non-active';
+                                        }
+                                        ?>
+                                    </td>
                                     <td>Rp.<?= number_format($user['balance']); ?></td>
                                     <td>
                                         <div class="row">

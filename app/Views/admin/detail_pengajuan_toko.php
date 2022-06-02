@@ -12,7 +12,7 @@
                     </center>
                     <div class=" card-body">
                         <h3 class="card-title"><b>&#64;<?= $toko->username; ?></b></h3>
-                        <h5 class="card-title"><i>&#64;<?= $toko->username_user; ?></i></h5>
+                        <h5 class="card-title"><i><?= $toko->email_user; ?></i></h5>
                         <p><i>&quot; <?= $toko->selogan; ?> &quot;</i></p>
                         <table class="table">
                             <tbody>

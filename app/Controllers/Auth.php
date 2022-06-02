@@ -26,7 +26,6 @@ class Auth extends BaseController
             $google_service = Oauth2($client);
             session()->set('gauth_token', $token['access_token']);
             $data = $google_service->userinfo->get();
-//            dd($data);
             $user = new \App\Models\User();
             $getuser = $user->where('email', $data['email'])->first();
             if (!$getuser) {
@@ -35,10 +34,15 @@ class Auth extends BaseController
                     'email' => $data['email'],
                     'fullname' => $data['name'],
                     'user_image' => $data['picture'],
-                    'status' => 1
+                    'status' => 1,
+                ]);
+                $iduser = $user->getInsertID();
+                $this->role->save([
+                    'iduser' => $iduser,
+                    'rules' => 2,
                 ]);
                 $newdata = [
-                    'id' => $user->getInsertID(),
+                    'id' => $iduser,
                     'logged_in' => true,
                 ];
 

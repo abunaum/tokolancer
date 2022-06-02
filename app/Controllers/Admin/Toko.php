@@ -3,14 +3,17 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Libraries\TeleApiLibrary;
 
 class Toko extends BaseController
 {
-    public $telelib;
     public function __construct()
     {
-        $this->telelib = new TeleApiLibrary;
+        helper(['role','tele']);
+        if (verifadmin() == 'invalid') {
+            header("HTTP/1.1 403 Forbidden");
+            header("Location: ". base_url());
+            exit;
+        }
     }
 
     public function pengajuan()
@@ -21,6 +24,7 @@ class Toko extends BaseController
         $user->select('users.*');
         $user->select('toko.username as usernametoko');
         $user->select('toko.id as idtoko');
+//        dd($user->findAll());
         $data = [
             'namaweb' => $this->namaweb,
             'judul' => "Admin Toko | $this->namaweb",
@@ -37,7 +41,7 @@ class Toko extends BaseController
         $toko->select('toko.*');
         $toko->select('users.telecode');
         $toko->select('users.teleid');
-        $toko->select('users.username as username_user');
+        $toko->select('users.email as email_user');
         $toko->where('status_toko', 2);
         $toko->where('toko.id', $id);
 
@@ -57,8 +61,8 @@ class Toko extends BaseController
         $user = $user->where('id', $toko->userid)->get()->getFirstRow();
         if ($user->telecode == 'valid') {
             $chatId = $user->teleid;
-            $pesan = $user->username . '\nMaaf aktivasi toko anda di tolak karena data yang dikirim tidak valid atau kurang jelas. Silahkan aktivasi ulang\n' . base_url('toko');
-            $this->telelib->kirimpesan($chatId, $pesan);
+            $pesan = $user->fullname . '\nMaaf aktivasi toko anda di tolak karena data yang dikirim tidak valid atau kurang jelas. Silahkan aktivasi ulang\n' . base_url('toko');
+            kirimpesan($chatId, $pesan);
         }
 
         $usergass = new $this->users;
@@ -90,8 +94,8 @@ class Toko extends BaseController
 
         if ($user->telecode == 'valid') {
             $chatId = $user->teleid;
-            $pesan = $user->username . '\nMantap, Toko anda telah di aktivasi, sekarang anda bisa berjualan di ' . base_url();
-            $this->telelib->kirimpesan($chatId, $pesan);
+            $pesan = $user->fullname . '\nMantap, Toko anda telah di aktivasi, sekarang anda bisa berjualan di ' . base_url();
+            kirimpesan($chatId, $pesan);
             session()->setFlashdata('pesan', 'Toko berhasil ACC');
         }
         $usergass = new $this->users;

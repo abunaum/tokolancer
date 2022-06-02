@@ -6,14 +6,22 @@ use App\Controllers\BaseController;
 
 class User extends BaseController
 {
+    public function __construct()
+    {
+        helper(['role']);
+        if (verifadmin() == 'invalid') {
+            header("HTTP/1.1 403 Forbidden");
+            header("Location: ". base_url());
+            exit;
+        }
+    }
     public function index()
     {
-        $user = new \App\Models\User();
         $data = [
             'namaweb' => $this->namaweb,
             'judul' => "Admin User | $this->namaweb",
-            'user' => $user->paginate(10),
-            'pager' => $user->pager,
+            'user' => $this->users->where('id !=', user()->id)->paginate(10),
+            'pager' => $this->users->where('id !=', user()->id)->pager,
         ];
         return view('admin/user', $data);
     }

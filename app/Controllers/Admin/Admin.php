@@ -3,14 +3,18 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Libraries\TeleApiLibrary;
 
 class Admin extends BaseController
 {
     public $telelib;
     public function __construct()
     {
-        $this->telelib = new TeleApiLibrary;
+        helper(['role','tele']);
+        if (verifadmin() == 'invalid') {
+            header("HTTP/1.1 403 Forbidden");
+            header("Location: ". base_url());
+            exit;
+        }
     }
     public function index()
     {
@@ -177,66 +181,6 @@ class Admin extends BaseController
         return redirect()->to(base_url('admin/subitem'));
     }
 
-    public function profile()
-    {
-        $data = [
-            'namaweb' => $this->namaweb,
-            'judul' => "Password | $this->namaweb",
-            'validation' => \Config\Services::validation()
-        ];
-        return view('admin/profile', $data);
-    }
-
-    public function ubahpassword()
-    {
-        if (!$this->validate([
-            'passwordlama' => 'required',
-            'passwordbaru' => 'required|strong_password',
-            'ulangipassword' => 'required|matches[passwordbaru]'
-        ])) {
-            session()->setFlashdata('error', 'Password gagal di ubah , Coba lagi');
-            return redirect()->to(base_url('admin/profile'))->withInput();
-        }
-        $user = $this->users->where('id', user()->id)->get()->getFirstRow();
-        $userid = $user->id;
-        $passworduser = $user->password_hash;
-        $passwordlama = $this->request->getVar('passwordlama');
-        $passwordbaru = $this->request->getVar('passwordbaru');
-
-        $result = password_verify(base64_encode(
-            hash('sha384', $passwordlama, true)
-        ), $passworduser);
-        if (!$result) {
-            session()->setFlashdata('error', 'Password gagal di ubah , Password lama salah.');
-            return redirect()->to(base_url('admin/profile'))->withInput();
-        }
-        $userproses = $this->users;
-        $hashOptions = [
-            "hashMemoryCost" => 2084,
-            "hashTimeCost" => 4,
-            "hashThreads" => 4,
-            "hashCost" => 10
-        ];
-        $passwordhash = password_hash(
-            base64_encode(
-                hash('sha384', $passwordbaru, true)
-            ),
-            PASSWORD_DEFAULT,
-            $hashOptions
-        );
-        $userproses->save([
-            'id' => $userid,
-            'password_hash' => $passwordhash
-        ]);
-        if ($user->telecode == 'valid') {
-            $chatId = $user->teleid;
-            $pesan = $user->username . '\nAnda berhasil mengubah password';
-            $this->telelib->kirimpesan($chatId, $pesan);
-        }
-        session()->setFlashdata('pesan', 'Password berhasil di ubah');
-        return redirect()->to(base_url('admin/profile'));
-    }
-
     public function notifikasi()
     {
         $user = $this->users->where('id', user()->id)->get()->getFirstRow();
@@ -269,7 +213,7 @@ class Admin extends BaseController
         $code = substr(str_shuffle($karakter), 0, 8);
         $chatId = $teleid;
         $pesan = 'Kode anda adalah : ' . $code;
-        $hasiltele = $this->telelib->kirimpesan($chatId, $pesan);
+        $hasiltele = kirimpesan($chatId, $pesan);
         if ($hasiltele == 'sukses') {
             $this->users->save([
                 'id' => user()->id,
@@ -298,7 +242,7 @@ class Admin extends BaseController
         $code = substr(str_shuffle($karakter), 0, 8);
         $chatId = $teleid;
         $pesan = 'Kode anda adalah : ' . $code;
-        $hasiltele = $this->telelib->kirimpesan($chatId, $pesan);
+        $hasiltele = kirimpesan($chatId, $pesan);
         if ($hasiltele == 'sukses') {
             $this->users->save([
                 'id' => user()->id,
@@ -318,7 +262,7 @@ class Admin extends BaseController
         $user = $this->users->where('id', user()->id)->get()->getFirstRow();
         $chatId = $user->teleid;
         $pesan = 'Kode anda adalah : ' . $user->telecode;
-        $this->telelib->kirimpesan($chatId, $pesan);
+        kirimpesan($chatId, $pesan);
         session()->setFlashdata('pesan', 'Kode konfirmasi berhasil dikirim ke Telegram.');
         return redirect()->to(base_url('admin/notifikasi'));
     }

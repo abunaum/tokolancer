@@ -37,15 +37,13 @@ $routes->get('logout', 'Auth::logout');
 $routes->group('auth', function ($routes) {
     $routes->get('cek', 'Auth::cek');
 });
-$routes->group('admin', function ($routes) {
+$routes->group('admin',["filter" => "auth"], function ($routes) {
     $routes->get('', 'Admin\Admin::index');
-    $routes->get('profile', 'Admin\Admin::profile');
     $routes->get('notifikasi', 'Admin\Admin::notifikasi');
     $routes->post('notifikasi', 'Admin\Admin::tambahtele');
     $routes->post('ubahtele', 'Admin\Admin::ubahtele');
     $routes->get('teleulang', 'Admin\Admin::telelagi');
     $routes->post('veriftele', 'Admin\Admin::veriftele');
-    $routes->post('ubahpassword', 'Admin\Admin::ubahpassword');
     $routes->group('download', function ($routes) {
         $routes->post('kartu/(:num)', 'Admin\Download::kartu/$1');
         $routes->post('selfi/(:num)', 'Admin\Download::selfi/$1');
@@ -77,7 +75,47 @@ $routes->group('admin', function ($routes) {
         $routes->post('acc/(:num)', 'Admin\Toko::pengajuanacc/$1');
     });
 });
+$routes->group('toko', ['filter' => 'auth'], function ($routes) {
+    $routes->get('', 'Toko\Fitur::index');
+    $routes->post('buattoko', 'Toko\Fitur::buat_toko');
+    $routes->post('edittoko', 'Toko\Fitur::edittoko');
+    $routes->post('aktivasitoko', 'Toko\Fitur::aktivasi');
+});
 
+$routes->group('user', ['filter' => 'auth'], function ($routes) {
+    $routes->get('notifikasi', 'User\notifikasi::index');
+    $routes->post('notifikasi', 'User\notifikasi::pasangtele');
+    $routes->get('notifikasi/kirimteleulang', 'User\notifikasi::teleulang');
+    $routes->post('notifikasi/ubahtele', 'User\notifikasi::ubahtele');
+    $routes->post('notifikasi/veriftele', 'User\notifikasi::veriftele');
+    $routes->get('profile', 'User\profile::index');
+    $routes->post('ubahdata', 'User\profile::ubahdata');
+    $routes->post('ubahpassword', 'User\profile::ubahpassword');
+    $routes->get('saldo', 'User\saldo::index');
+    $routes->post('tambahsaldo', 'User\saldo::tambah');
+    $routes->get('saldo/topup', 'User\saldo::topup');
+    $routes->post('topup/prosess/(:num)', 'User\saldo::topupproses/$1');
+    $routes->get('topup/prosess/(:num)', 'User\saldo::topupproses/$1');
+    $routes->post('topup/ulangprosess/(:num)', 'User\saldo::ulangtopupproses/$1');
+    $routes->get('topup/ulangprosess/(:num)', 'User\saldo::ulangtopupproses/$1');
+    $routes->delete('transaksisaldo/hapus/(:num)', 'User\saldo::transaksihapus/$1');
+    $routes->group('toko', function ($routes) {
+        $routes->get('produk', 'User\toko::produk');
+        $routes->get('pengaturan', 'User\toko::pengaturan');
+        $routes->get('produk/detail/(:num)', 'User\toko::produkdetail/$1');
+        $routes->delete('produk/hapus/(:num)', 'User\toko::hapusproduk/$1');
+        $routes->post('produk/edit/(:num)', 'User\toko::editproduk/$1');
+        $routes->get('tambah', 'User\toko::tambah');
+        $routes->post('tambahproduk', 'User\toko::tambahproduk');
+    });
+    $routes->group('order', function ($routes) {
+        $routes->get('produk', 'User\order::order');
+        $routes->get('keranjang', 'User\order::keranjang');
+        $routes->delete('semuakeranjang', 'User\order::hapussemuakeranjang');
+        $routes->delete('keranjang/(:num)', 'User\order::hapuskeranjang/$1');
+        $routes->post('proses', 'User\order::proseskeranjang');
+    });
+});
 /*
  * --------------------------------------------------------------------
  * Additional Routing

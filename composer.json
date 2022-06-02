@@ -8,7 +8,8 @@
         "php": "^7.3 || ^8.0",
         "codeigniter4/framework": "^4",
         "google/apiclient": "^2.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",
