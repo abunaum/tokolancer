@@ -37,6 +37,8 @@ $routes->get('logout', 'Auth::logout');
 $routes->group('auth', function ($routes) {
     $routes->get('cek', 'Auth::cek');
 });
+
+$routes->get('produk/detail/(:num)', 'Home::produkdetail/$1');
 $routes->group('admin',["filter" => "auth"], function ($routes) {
     $routes->get('', 'Admin\Admin::index');
     $routes->get('notifikasi', 'Admin\Admin::notifikasi');
@@ -109,13 +111,18 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->post('tambahproduk', 'User\toko::tambahproduk');
     });
     $routes->group('order', function ($routes) {
-        $routes->get('produk', 'User\order::order');
+        $routes->post('produk/(:num)', 'User\order::produk/$1');
         $routes->get('keranjang', 'User\order::keranjang');
         $routes->delete('semuakeranjang', 'User\order::hapussemuakeranjang');
         $routes->delete('keranjang/(:num)', 'User\order::hapuskeranjang/$1');
         $routes->post('proses', 'User\order::proseskeranjang');
+        $routes->post('edit/(:num)', 'User\order::editkeranjang/$1');
+    });
+    $routes->group('keranjang', function ($routes) {
+        $routes->get('produk/(:num)', 'User\order::tambahkeranjang/$1');
     });
 });
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

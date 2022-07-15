@@ -9,6 +9,12 @@ class Auth extends BaseController
 {
     public function login()
     {
+        if ($this->request->getVar('url')){
+            $redirect = [
+                'url'  => $this->request->getVar('url'),
+            ];
+            session()->set($redirect);
+        }
         helper('gauth');
         $client = client();
         $client->setRedirectUri(base_url('auth/cek'));
@@ -60,7 +66,13 @@ class Auth extends BaseController
 
                 session()->set($newdata);
             }
-            return redirect()->to(base_url());
+            if (session('url')){
+                $redirect = session('url');
+                session()->remove('url');
+                return redirect()->to($redirect);
+            } else {
+                return redirect()->to(base_url());
+            }
         } else {
             $url = $client->createAuthUrl();
             return redirect()->to($url);

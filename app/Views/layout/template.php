@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/css/tombol-buka-tutup.css">
     <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <link rel="apple-touch-icon" href="<?= base_url('img/logo/196.png') ?>">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title><?= $judul; ?></title>
 </head>
 

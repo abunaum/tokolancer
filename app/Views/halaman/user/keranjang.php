@@ -52,17 +52,62 @@
                                 </span>
                             </td>
                             <td data-title="Pesan ke penjual">
-                                <span><?= $keranjang['pesan'] ?></span>
+                                <span><?= $keranjang['pesan'] == '' ? 'Tidak ada pesan' : $keranjang['pesan'] ?></span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <div class="col-12">
-                    <form action="<?= base_url('user/order/keranjang') . '/' . $keranjang['id'] ?>" method="post">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="button" class="btn btn-danger delete-one" style="width: 100%;" data-nama="<?= $keranjang['nama_produk'] ?>">Hapus</button>
-                    </form>
+                <div class="row">
+                    <div class="col-6">
+                        <form action="<?= base_url('user/order/keranjang') . '/' . $keranjang['id'] ?>" method="post">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                    data-nama="<?= $keranjang['nama_produk'] ?>">Hapus
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-warning" data-toggle="modal" style="width: 100%;" data-target="#editModal<?= $keranjang['id'] ?>">
+                            Edit
+                        </button>
+                        <div class="modal fade" id="editModal<?= $keranjang['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="editModal<?= $keranjang['id'] ?>Title" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <form action="<?= base_url('user/order/edit'.'/'. $keranjang['id']) ?>" method="post">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="prosesModalTitle">Edit Pesanan</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div style="text-align: center;">
+                                                <?= csrf_field(); ?>
+                                                <span class="input-group mb-3">Nama Produk : <?= $keranjang['nama_produk'];?></span>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="basic-addon1">Jumlah</span>
+                                                    </div>
+                                                    <input type="number" class="form-control" placeholder="jumlah" aria-label="jumlah" name="jumlah" id="jumlah" value="<?= $keranjang['jumlah'] ?>">
+                                                </div>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="basic-addon1">Pesan</span>
+                                                    </div>
+                                                    <textarea class="form-control" placeholder="Pesan" name="pesan" id="pesan"><?=$keranjang['pesan'];?></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Edit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <hr style="border-top: 2px dashed green;">
             <?php endforeach; ?>
@@ -79,7 +124,6 @@
                         Proses
                     </button>
                 </div>
-                </form>
             </div>
         <?php else : ?>
             <center>
@@ -130,7 +174,6 @@
         </div>
     </div>
 </section>
-</div>
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
@@ -169,4 +212,60 @@
         })
     })
 </script>
+<?php if (session('error')) :?>
+    <script>
+        const error = '<?= session('error');?>';
+        let timerInterval
+        Swal.fire({
+            icon: 'error',
+            title: 'Maaf',
+            html: error,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                }, 100)
+            },
+            willClose: () => {
+                clearInterval(timerInterval)
+            }
+        }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log('I was closed by the timer')
+            }
+        })
+    </script>
+<?php elseif (session('sukses')) : ?>
+<script>
+    const pesan = '<?= session('sukses');?>';
+    let timerInterval
+    Swal.fire({
+        icon: 'success',
+        title: 'Mantap',
+        html: pesan,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+                b.textContent = Swal.getTimerLeft()
+            }, 100)
+        },
+        willClose: () => {
+            clearInterval(timerInterval)
+        }
+    }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+        }
+    })
+</script>
+<?php endif; ?>
+
 <?= $this->endSection(); ?>

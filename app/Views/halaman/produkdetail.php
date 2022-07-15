@@ -24,7 +24,7 @@
                         <i>Stok : <?= $produk->stok; ?></i>
                     </p>
                     <p class="text-muted text-uppercase small">
-                        Store : <i>@<?= $produk->toko_username; ?></i>
+                        Store : <i>@<?= $toko->username; ?></i>
                     </p>
                     <div>
                         <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
@@ -43,7 +43,11 @@
                     </p>
                     <hr>
                     <div class="mb-3">
-                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal">Beli</button>
+                        <?php if (session('logged_in') != true) : ?>
+                            <a type="button" class="btn btn-success" href="<?= base_url('login?url='. str_replace("index.php/","",current_url()));?>">Login untuk membeli</a>
+                        <?php else : ?>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal">Beli</button>
+                        <?php endif; ?>
                     </div>
                 </center>
             </div>
@@ -67,7 +71,7 @@
                                 </span>
 
                                 <h2 class="woocommerce-loop-product__title"><?= $pu['nama']; ?></h2>
-                                <h2 class="woocommerce-loop-product__title"><i>@<?= $produk->toko_username; ?></i></h2>
+                                <h2 class="woocommerce-loop-product__title"><i>@<?= $toko->username; ?></i></h2>
                             </a>
 
                             <div class="hover-area">
@@ -87,7 +91,7 @@
                             </center>
                             <button type="button" class="iconify" data-icon="clarity:window-close-line" data-inline="false" data-width="24px" data-height="24px" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form class="g-3 needs-validation" action="<?= base_url("order/$produk->id") ?>" method="post">
+                        <form class="g-3 needs-validation" action="<?= base_url("user/order/produk/$produk->id") ?>" method="post">
                             <?= csrf_field() ?>
                             <div class="modal-body">
                                 <div class="form-group mb-3">
@@ -101,11 +105,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary">
-                                    <?php if (logged_in() == true) : ?>
-                                        Beli
-                                    <?php else : ?>
-                                        Login & Beli
-                                    <?php endif; ?>
+                                    Beli
                                 </button>
                             </div>
                         </form>

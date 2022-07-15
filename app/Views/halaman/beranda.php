@@ -24,9 +24,9 @@
                                     <a class="button" href="<?= base_url('produk/detail') . '/' . $p['id'] ?>">Detail</a>
                                     <?php if ($p['status'] == 1) : ?>
                                         <?php if (cek_login() == true) : ?>
-                                            <a class="button">Beli</a>
+                                            <a class="button" href="<?= base_url('user/keranjang/produk' . '/' . $p['id']) ;?>">Beli</a>
                                         <?php else : ?>
-                                            <a class="button">Login & Beli</a>
+                                            <a class="button" href="<?= base_url('login') ;?>">Login & Beli</a>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
@@ -55,4 +55,59 @@
     </div>
     <!-- .col-full -->
 </section>
+<?php if (session('error')) :?>
+<script>
+    const error = '<?= session('error');?>';
+    let timerInterval
+    Swal.fire({
+        icon: 'error',
+        title: 'Maaf',
+        html: error,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+                b.textContent = Swal.getTimerLeft()
+            }, 100)
+        },
+        willClose: () => {
+            clearInterval(timerInterval)
+        }
+    }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+        }
+    })
+</script>
+<?php elseif (session('sukses')) : ?>
+<script>
+    const pesan = '<?= session('sukses');?>';
+    let timerInterval
+    Swal.fire({
+        icon: 'success',
+        title: 'Mantap',
+        html: pesan,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+                b.textContent = Swal.getTimerLeft()
+            }, 100)
+        },
+        willClose: () => {
+            clearInterval(timerInterval)
+        }
+    }).then((result) => {
+        /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+            console.log('I was closed by the timer')
+        }
+    })
+</script>
+<?php endif; ?>
 <?= $this->endSection(); ?>

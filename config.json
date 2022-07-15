@@ -2,5 +2,15 @@
     "gauth": {
         "id": "446374296153-dk251ced09t6nih0l5hc93kc1sudesku.apps.googleusercontent.com",
         "secret": "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"
+    },
+    "payment": {
+        "apikey": "DEV-hIvWW2APKrWpEO68PXC4LWKhU3h4oBui23eJNJIr",
+        "apiprivatekey": "qLlfi-VMwzL-nXVl0-bFPpa-bt6YS",
+        "urlpaymentchannel": "https://payment.tripay.co.id/api-sandbox/merchant/payment-channel",
+        "urlfeekalkulator": "https://payment.tripay.co.id/api-sandbox/merchant/fee-calculator?",
+        "urlcreatepayment": "https://payment.tripay.co.id/api-sandbox/transaction/create",
+        "urldetailtransaksi": "https://payment.tripay.co.id/api-sandbox/transaction/detail?",
+        "kodemerchant": "T1438",
+        "callback": "api/proses/gasspol/mantap/callback"
     }
 }

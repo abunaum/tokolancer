@@ -20,6 +20,7 @@ class order extends BaseController
     {
         $pesan = $this->request->getVar('pesan');
         $jumlah = $this->request->getVar('jumlah');
+        $produkid = $id;
         if (!$this->validate([
             'jumlah' => 'required|is_natural_no_zero'
         ])) {
@@ -27,31 +28,7 @@ class order extends BaseController
 
             return redirect()->to(base_url("produk/detail/$id"))->withInput();
         }
-        $produk = $this->produk;
-        $produk = (object)$produk->detail($id)->first();
-        $order = [
-            'order'  => [
-                'id_produk' => $id,
-                'pesan' => $pesan,
-                'jumlah' => $jumlah
-            ]
-        ];
-
-        session()->set($order);
-        return redirect()->to(base_url('user/order/produk'));
-    }
-
-    public function order()
-    {
-        $order = session('order');
-        if (!isset($order)) {
-            return redirect()->to(base_url("user/order/keranjang"));
-        }
-        $produkid = $order['id_produk'];
-        $pesan = $order['pesan'];
-        $jumlah = $order['jumlah'];
-        session()->remove('order');
-        $produk = $this->produk->detail($produkid)->first();
+        $produk = $this->produk->where('id', $produkid)->first();
         if ($produk['owner'] == user()->id) {
             session()->setFlashdata('error', 'Dilarang membeli produk sendiri !!!');
             return redirect()->to(base_url("produk/detail/$produkid"));
@@ -67,8 +44,59 @@ class order extends BaseController
         return redirect()->to(base_url("produk/detail/$produkid"));
     }
 
+    public function tambahkeranjang($idp)
+    {
+        helper('user');
+        if (!$idp){
+            session()->setFlashdata('error', 'Produk tidak ditemukan');
+            return redirect()->to(base_url());
+        }
+        $produkid = $idp;
+        $produk = $this->produk->where('id', $produkid)->first();
+        if ($produk['owner'] == user()->id) {
+            session()->setFlashdata('error', 'Dilarang membeli produk sendiri !!!');
+            return redirect()->to(base_url());
+        }
+        $this->keranjang->save([
+            'buyer' => user()->id,
+            'produk' => $produkid,
+            'jumlah' => 1,
+            'status' => 1
+        ]);
+        session()->setFlashdata('sukses', 'Produk berhasil ditambah ke keranjang');
+        return redirect()->to(base_url());
+    }
+    public function editkeranjang($idp)
+    {
+        helper('user');
+        $pesan = $this->request->getVar('pesan');
+        $jumlah = $this->request->getVar('jumlah');
+        $produkid = $idp;
+        if (!$this->validate([
+            'jumlah' => 'required|is_natural_no_zero'
+        ])) {
+            session()->setFlashdata('error', 'Gagal edit keranjang , Coba lagi');
+
+            return redirect()->to(base_url("user/order/keranjang"))->withInput();
+        }
+        if (!$idp){
+            session()->setFlashdata('error', 'Produk tidak ditemukan');
+            return redirect()->to(base_url());
+        }
+        $this->keranjang->update(
+            $produkid,
+            [
+                'pesan' => $pesan,
+                'jumlah' => $jumlah,
+            ]
+        );
+        session()->setFlashdata('sukses', 'Keranjang berhasil di edit');
+        return redirect()->to(base_url('user/order/keranjang'));
+    }
+
     public function keranjang()
     {
+        helper('payment');
         $item = $this->getitem->getsub();
         $keranjang = $this->keranjang;
         $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
@@ -86,7 +114,7 @@ class order extends BaseController
         $totalkeranjang = $hasilkeranjang->countAllResults();
         $harga = array_column($keranjang, 'harga_produk');
         $totalharga = array_sum($harga);
-        $pembayaran = $this->apilib->getmerchantclosed();
+        $pembayaran = getmerchantclosed(datapayment());
         $data = [
             'judul' => "keranjang | $this->namaweb",
             'item' => $item,

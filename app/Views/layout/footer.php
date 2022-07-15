@@ -148,7 +148,7 @@
     <div class="site-info">
         <center>
             <div class="col-full">
-                <div class="copyright">Copyright &copy; <a href="home-v1.html"><?= $_SERVER['HTTP_HOST'] ?> .</a> All rights reserved.</div>
+                <div class="copyright">Copyright &copy; <a href="<?= base_url() ;?>"><?= $_SERVER['HTTP_HOST'] ?> .</a> All rights reserved.</div>
                 <!-- .credit -->
             </div>
         </center>
