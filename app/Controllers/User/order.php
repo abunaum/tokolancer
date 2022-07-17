@@ -15,6 +15,7 @@ class order extends BaseController
     {
         $this->apilib = new PaymentApiLibrary();
         $this->getitem = new Itemlibrary();
+        helper('payment');
     }
     public function produk($id = 0)
     {
@@ -66,12 +67,12 @@ class order extends BaseController
         session()->setFlashdata('sukses', 'Produk berhasil ditambah ke keranjang');
         return redirect()->to(base_url());
     }
-    public function editkeranjang($idp)
+    public function editkeranjang($idk)
     {
         helper('user');
         $pesan = $this->request->getVar('pesan');
         $jumlah = $this->request->getVar('jumlah');
-        $produkid = $idp;
+        $keranjangid = $idk;
         if (!$this->validate([
             'jumlah' => 'required|is_natural_no_zero'
         ])) {
@@ -79,12 +80,12 @@ class order extends BaseController
 
             return redirect()->to(base_url("user/order/keranjang"))->withInput();
         }
-        if (!$idp){
+        if (!$idk){
             session()->setFlashdata('error', 'Produk tidak ditemukan');
             return redirect()->to(base_url());
         }
         $this->keranjang->update(
-            $produkid,
+            $keranjangid,
             [
                 'pesan' => $pesan,
                 'jumlah' => $jumlah,
@@ -96,7 +97,6 @@ class order extends BaseController
 
     public function keranjang()
     {
-        helper('payment');
         $item = $this->getitem->getsub();
         $keranjang = $this->keranjang;
         $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
@@ -104,16 +104,22 @@ class order extends BaseController
         $keranjang->select('keranjang.id');
         $keranjang->select('keranjang.jumlah');
         $keranjang->select('keranjang.pesan');
+        $keranjang->select('keranjang.status');
         $keranjang->select('toko.username as nama_toko');
         $keranjang->select('produk.id as id_produk');
         $keranjang->select('produk.nama as nama_produk');
         $keranjang->select('produk.harga as harga_produk');
         $keranjang->select('produk.gambar as gambar_produk');
-        $hasilkeranjang = $keranjang->where('buyer', user()->id);
+        $keranjang->where('buyer', user()->id);
+        $hasilkeranjang = $keranjang->where('keranjang.status', 1);
         $keranjang = $hasilkeranjang->findAll();
-        $totalkeranjang = $hasilkeranjang->countAllResults();
+        $totalkeranjang = count($keranjang);
         $harga = array_column($keranjang, 'harga_produk');
-        $totalharga = array_sum($harga);
+        $hp = [];
+        foreach ($keranjang as $k) {
+            array_push($hp, $k['harga_produk'] * $k['jumlah']);
+        }
+        $totalharga = array_sum($hp);
         $pembayaran = getmerchantclosed(datapayment());
         $data = [
             'judul' => "keranjang | $this->namaweb",
@@ -122,7 +128,6 @@ class order extends BaseController
             'totalharga' => $totalharga,
             'pembayaran' => $pembayaran,
             'totalkeranjang' => $totalkeranjang,
-            'paymentapi' => $this->apilib,
         ];
 
         return view('halaman/user/keranjang', $data);
@@ -152,9 +157,95 @@ class order extends BaseController
     public function proseskeranjang()
     {
         $channel = $this->request->getVar('metode');
+        $ovo = $this->request->getVar('noovo');
         if (!isset($channel)) {
             return redirect()->to(base_url('user/order/keranjang'));
         }
-        echo $channel;
+        $keranjang = $this->keranjang;
+        $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $hasilkeranjang = $keranjang->where('buyer', user()->id);
+        $keranjang = $hasilkeranjang->findAll();
+        $hp = [];
+        foreach ($keranjang as $k) {
+            array_push($hp, $k['harga'] * $k['jumlah']);
+        }
+        $totalharga = array_sum($hp);
+        $order_number = 'INV-'.md5(uniqid(mt_rand(), true).microtime(true));
+        $item = [];
+        $i =1;
+        foreach ($keranjang as $k) {
+            $forder = [
+                'sku' => 'O'.$i.'-'.$order_number,
+                'name' => $k['nama'],
+                'price' => $k['harga'],
+                'quantity' => $k['jumlah'],
+                'product_url' => base_url('produk/detail').'/'.$k['produk'],
+                'image_url' => base_url('img/produk').'/'.$k['gambar'],
+            ];
+            array_push($item, $forder);
+            $i++;
+        }
+        if ($channel == 'OVO'){
+            $nomor = $ovo;
+        } else{
+            $nomor = 'CS - 085173456771';
+        }
+        $proses = createtransaction(datapayment(),$item, $order_number, $channel, $totalharga, $nomor);
+        $hasil = json_decode($proses,true);
+        if ($hasil['success'] != true){
+            session()->setFlashdata('error', 'Gagal melakukan transaksi');
+            return redirect()->to(base_url('user/order/keranjang'));
+        } else {
+            $keranjang = $this->keranjang;
+            $keranjang->where('buyer', user()->id);
+            $keranjang->where('status', 1);
+            $keranjang = $hasilkeranjang->findAll();
+            foreach ($keranjang as $k) {
+                $kid = $k['id'];
+                $this->keranjang->update(
+                    $kid,
+                    [
+                        'invoice' => $hasil['data']['merchant_ref'],
+                        'status' => 2,
+                    ]
+                );
+            }
+            $invoice = $this->invoice;
+            $invoice->save([
+                'kode' => $hasil['data']['merchant_ref'],
+                'channel' => $hasil['data']['payment_method'],
+                'nominal' => $hasil['data']['amount_received'],
+                'fee' => $hasil['data']['total_fee'],
+                'referensi' => $hasil['data']['reference'],
+                'status' => $hasil['data']['status']
+            ]);
+        }
+        session()->setFlashdata('pesan', 'Transaksi sudah di buat, Silahkan melakukan pembayaran');
+        return redirect()->to(base_url('user/order/transaksi'));
+    }
+
+    public function transaksi()
+    {
+        $item = $this->getitem->getsub();
+        $keranjang = $this->keranjang;
+        $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $keranjang->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $keranjang->select('keranjang.id');
+        $keranjang->select('keranjang.jumlah');
+        $keranjang->select('keranjang.pesan');
+        $keranjang->select('keranjang.status');
+        $keranjang->select('keranjang.invoice');
+        $keranjang->select('toko.username as nama_toko');
+        $keranjang->select('produk.id as id_produk');
+        $keranjang->select('produk.nama as nama_produk');
+        $keranjang->select('produk.harga as harga_produk');
+        $keranjang->select('produk.gambar as gambar_produk');
+        $keranjang->where('buyer', user()->id);
+        $keranjang->where('keranjang.status !=', 1);
+        $keranjang = $keranjang->findAll();
+        foreach($keranjang as $key => $value){
+            $invgroup[$value['invoice']][$key] = $value;
+        }
+        dd($invgroup);
     }
 }

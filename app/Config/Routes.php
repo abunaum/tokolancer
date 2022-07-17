@@ -113,6 +113,7 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
     $routes->group('order', function ($routes) {
         $routes->post('produk/(:num)', 'User\order::produk/$1');
         $routes->get('keranjang', 'User\order::keranjang');
+        $routes->get('transaksi', 'User\order::transaksi');
         $routes->delete('semuakeranjang', 'User\order::hapussemuakeranjang');
         $routes->delete('keranjang/(:num)', 'User\order::hapuskeranjang/$1');
         $routes->post('proses', 'User\order::proseskeranjang');

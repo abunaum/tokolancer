@@ -36,6 +36,7 @@
                             <?php
                             $keranjang = new \App\Models\Keranjang();
                             $keranjang->where('buyer', user()->id);
+                            $keranjang->where('status', 1);
                             $totalkeranjang = $keranjang->countAllResults();
                             ?>
                             <?php if ($totalkeranjang >= 1) : ?>
@@ -53,9 +54,21 @@
                 </ul>
                 <ul class="header-wishlist nav navbar-nav">
                     <li class="nav-item">
-                        <a class="cart-contents" href="<?= base_url('toko') ?>">
+                        <a class="cart-contents" href="<?= base_url('user/order/invoice') ?>">
                             <span class="iconify" data-icon="la:clipboard-list" data-inline="false" data-width="24px" data-height="24px"></span>
-                            <span class="count">1</span>
+                            <?php
+                            $keranjang = new \App\Models\Keranjang();
+                            $keranjang->where('buyer', user()->id);
+                            $keranjang->where('status', 2);
+                            $keranjang = $keranjang->findAll();
+                            foreach($keranjang as $key => $value){
+                                $invgroup[$value['invoice']][$key] = $value;
+                            }
+                            $inv = count($invgroup);
+                            ?>
+                            <?php if ($inv >= 1) : ?>
+                                <span class="count"><?= $inv ?></span>
+                            <?php endif; ?>
                         </a>
                     </li>
                 </ul>

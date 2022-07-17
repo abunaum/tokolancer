@@ -62,7 +62,7 @@ class BaseController extends Controller
         $this->invoice = new \App\Models\Invoice();
 
         //helper
-        helper(['item' ,'auth','user']);
+        helper(['item' ,'auth','user','number']);
         // E.g.: $this->session = \Config\Services::session();
     }
 }

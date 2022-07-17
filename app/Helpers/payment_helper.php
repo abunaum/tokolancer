@@ -100,18 +100,18 @@ function paymentkalkulator($payment,$channel, $saldo)
     return $data['data'][0]['total_fee'];
 }
 
-function createtransaction($payment,$dataitem, $order_number, $channel, $totalbayar)
+function createtransaction($payment,$dataitem, $order_number, $channel, $totalbayar, $phone)
 {
     $data = [
         'method'            => $channel,
         'merchant_ref'      => $order_number,
         'amount'            => $totalbayar,
-        'customer_name'     => user()->username,
+        'customer_name'     => user()->fullname,
         'customer_email'    => user()->email,
-        'customer_phone'    => 'CS - 085155118423',
+        'customer_phone'    => $phone,
         'order_items'       => $dataitem,
-        'callback_url'      => $payment['callback'],
-        'return_url'        => base_url('user/saldo/topup'),
+        'callback_url'      => base_url().'/'.$payment['callback'],
+        'return_url'        => base_url('user/invoice'),
         'expired_time'      => (time() + (24 * 60 * 60)), // 24 jam
         'signature'         => hash_hmac('sha256', $payment['kodemerchant'] . $order_number . $totalbayar, $payment['apiprivatekey'])
     ];
