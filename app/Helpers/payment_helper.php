@@ -111,7 +111,7 @@ function createtransaction($payment,$dataitem, $order_number, $channel, $totalba
         'customer_phone'    => $phone,
         'order_items'       => $dataitem,
         'callback_url'      => base_url().'/'.$payment['callback'],
-        'return_url'        => base_url('user/invoice'),
+        'return_url'        => base_url('user/order/transaksi'),
         'expired_time'      => (time() + (24 * 60 * 60)), // 24 jam
         'signature'         => hash_hmac('sha256', $payment['kodemerchant'] . $order_number . $totalbayar, $payment['apiprivatekey'])
     ];
@@ -148,7 +148,7 @@ function detailtransaksi($payment,$referensi)
 
     curl_setopt_array($curl, array(
         CURLOPT_FRESH_CONNECT     => true,
-        CURLOPT_URL               => $payment['detailtransaksiurl'] . http_build_query($payload),
+        CURLOPT_URL               => $payment['urldetailtransaksi'] . http_build_query($payload),
         CURLOPT_RETURNTRANSFER    => true,
         CURLOPT_HEADER            => false,
         CURLOPT_HTTPHEADER        => array(

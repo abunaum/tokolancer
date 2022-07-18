@@ -21,7 +21,9 @@
                     <tbody>
                         <tr>
                             <td class="product-remove">
-                                <a class="remove" href="#">×</a>
+                                <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                        data-nama="<?= $ker['nama_produk'] ?>">Hapus
+                                </button>
                             </td>
                             <td class="product-thumbnail">
                                 <img width="180" height="180" alt="" class="wp-post-image" src="<?= base_url(); ?>/logotoko.png">

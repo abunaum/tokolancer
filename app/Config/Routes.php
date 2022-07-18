@@ -38,6 +38,8 @@ $routes->group('auth', function ($routes) {
     $routes->get('cek', 'Auth::cek');
 });
 
+$routes->post('api/proses/gasspol/mantap/callback', 'Callback::callback');
+
 $routes->get('produk/detail/(:num)', 'Home::produkdetail/$1');
 $routes->group('admin',["filter" => "auth"], function ($routes) {
     $routes->get('', 'Admin\Admin::index');
@@ -114,8 +116,10 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->post('produk/(:num)', 'User\order::produk/$1');
         $routes->get('keranjang', 'User\order::keranjang');
         $routes->get('transaksi', 'User\order::transaksi');
+        $routes->post('bayar/(:num)', 'User\order::bayar/$1');
         $routes->delete('semuakeranjang', 'User\order::hapussemuakeranjang');
         $routes->delete('keranjang/(:num)', 'User\order::hapuskeranjang/$1');
+        $routes->delete('invoice/(:num)', 'User\order::hapusinvoice/$1');
         $routes->post('proses', 'User\order::proseskeranjang');
         $routes->post('edit/(:num)', 'User\order::editkeranjang/$1');
     });

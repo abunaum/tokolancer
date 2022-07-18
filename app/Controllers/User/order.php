@@ -226,6 +226,7 @@ class order extends BaseController
 
     public function transaksi()
     {
+        $newinv = $this->invoice;
         $item = $this->getitem->getsub();
         $keranjang = $this->keranjang;
         $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
@@ -241,11 +242,72 @@ class order extends BaseController
         $keranjang->select('produk.harga as harga_produk');
         $keranjang->select('produk.gambar as gambar_produk');
         $keranjang->where('buyer', user()->id);
-        $keranjang->where('keranjang.status !=', 1);
+        $keranjang->where('keranjang.status', 2);
         $keranjang = $keranjang->findAll();
-        foreach($keranjang as $key => $value){
-            $invgroup[$value['invoice']][$key] = $value;
+
+        $paid = $this->keranjang;
+        $paid->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $paid->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $paid->select('keranjang.id');
+        $paid->select('keranjang.jumlah');
+        $paid->select('keranjang.pesan');
+        $paid->select('keranjang.status');
+        $paid->select('keranjang.invoice');
+        $paid->select('toko.username as nama_toko');
+        $paid->select('produk.id as id_produk');
+        $paid->select('produk.nama as nama_produk');
+        $paid->select('produk.harga as harga_produk');
+        $paid->select('produk.gambar as gambar_produk');
+        $paid->where('buyer', user()->id);
+        $paid->where('keranjang.status !=', 1);
+        $paid->where('keranjang.status !=', 2);
+        $paid = $paid->findAll();
+
+        $invgroup = [];
+        foreach($keranjang as $value){
+            $invgroup[$value['invoice']][] = $value;
         }
-        dd($invgroup);
+        $invgr = [];
+        foreach ($invgroup as $type => $labels) {
+            $tr = $newinv->where('kode', $type)->first();
+            $invgr[] = [
+                'kode' => $type,
+                'payment' => $tr,
+                'data' => $labels,
+            ];
+        }
+        $data = [
+            'judul' => "Invoice | $this->namaweb",
+            'item' => $item,
+            'invoice' => $invgr,
+            'transaksi' => $paid,
+            'total_invoice' => count($invgr)
+        ];
+
+        return view('halaman/user/invoice', $data);
+    }
+
+    public function bayar($id = 0)
+    {
+        $inv = $this->invoice->where('id', $id)->first();
+        $cek = json_decode(detailtransaksi(datapayment(),$inv['referensi']), true);
+        if ($cek['success'] != true){
+            session()->setFlashdata('error', 'Terjadi kesalahan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        } else {
+            return redirect()->to($cek['data']['checkout_url']);
+        }
+    }
+
+    public function hapusinvoice($id =0)
+    {
+        $inv = $this->invoice->where('id', $id)->first();
+        $kode = $inv['kode'];
+        $this->keranjang->where('invoice', $inv['kode'])->delete();
+        $this->keranjang->where('invoice', $inv['kode'])->purgeDeleted();
+        $this->invoice->where('id', $id)->delete();
+        $this->invoice->where('id', $id)->purgeDeleted();
+        session()->setFlashdata('pesan', 'Transaksi '. $kode . 'sudah di hapus');
+        return redirect()->to(base_url('user/order/transaksi'));
     }
 }

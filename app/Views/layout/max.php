@@ -54,20 +54,21 @@
                 </ul>
                 <ul class="header-wishlist nav navbar-nav">
                     <li class="nav-item">
-                        <a class="cart-contents" href="<?= base_url('user/order/invoice') ?>">
+                        <a class="cart-contents" href="<?= base_url('user/order/transaksi') ?>">
                             <span class="iconify" data-icon="la:clipboard-list" data-inline="false" data-width="24px" data-height="24px"></span>
                             <?php
                             $keranjang = new \App\Models\Keranjang();
                             $keranjang->where('buyer', user()->id);
                             $keranjang->where('status', 2);
                             $keranjang = $keranjang->findAll();
-                            foreach($keranjang as $key => $value){
-                                $invgroup[$value['invoice']][$key] = $value;
-                            }
-                            $inv = count($invgroup);
                             ?>
-                            <?php if ($inv >= 1) : ?>
-                                <span class="count"><?= $inv ?></span>
+                            <?php if (count($keranjang) >= 1) : ?>
+                                <?php
+                                foreach ($keranjang as $key => $value) {
+                                    $invgroup[$value['invoice']][$key] = $value;
+                                };
+                                ?>
+                                <span class="count"><?= count($invgroup) ?></span>
                             <?php endif; ?>
                         </a>
                     </li>
