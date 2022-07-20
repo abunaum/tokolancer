@@ -93,9 +93,10 @@
                     <hr style="border-top: 2px dashed green;">
                 </center>
             <?php endif; ?>
+            <?php if ($transaksi) : ?>
             <center>
-                <h1>Data Transaksi</h1>
-                <?php foreach ($transaksi as $ter) : ?>
+                <h1>Transaksi berlangsung</h1>
+                <?php foreach ($transaksi[3] as $ter) : ?>
                     <table class="shop_table shop_table_responsive cart">
                         <thead>
                         <tr>
@@ -148,25 +149,8 @@
                             <td data-title="Pesan ke penjual">
                                 <span><?= $ter['pesan'] == '' ? 'Tidak ada pesan' : $ter['pesan'] ?></span>
                             </td>
-                            <?php
-                            if ($ter['status'] == 3){
-                                $status = 'Menunggu dikirim';
-                            }
-                            elseif ($ter['status'] == 4){
-                                $status = 'Ditolak Seller';
-                            }
-                            elseif ($ter['status'] == 5){
-                                $status = 'Dikirim';
-                            }
-                            elseif ($ter['status'] == 6){
-                                $status = 'selesai';
-                            }
-                            else {
-                                $status = 'Produk bermasalah';
-                            }
-                            ?>
                             <td data-title="Status">
-                                <span><?= $status;?></span>
+                                <span>Menunggu Dikirim</span>
                             </td>
                             <td data-title="Aksi">
                                 <form action="<?= base_url('user/order/canceltransaksi') . '/' . $ter['id'] ?>" method="post">
@@ -180,9 +164,159 @@
                         </tr>
                         </tbody>
                     </table>
-                    <hr style="border-top: 2px dashed green;">
                 <?php endforeach; ?>
             </center>
+            <?php endif; ?>
+            <?php if ($kirim) : ?>
+            <hr style="border-top: 2px dashed green;">
+            <center>
+                <h1>Pesanan dikirim</h1>
+                <?php foreach ($kirim[5] as $kir) : ?>
+                    <table class="shop_table shop_table_responsive cart">
+                        <thead>
+                        <tr>
+                            <th class="product-remove">&nbsp;</th>
+                            <th class="product-thumbnail">&nbsp;</th>
+                            <th class="product-name">Produk</th>
+                            <th class="product-name">Store</th>
+                            <th class="product-price">Harga</th>
+                            <th class="product-price">Jumlah</th>
+                            <th class="product-quantity">Pesan</th>
+                            <th class="product-quantity">Status</th>
+                            <th class="product-quantity">Aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="product-remove">
+                                <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                        data-nama="<?= $kir['nama_produk'] ?>">Hapus
+                                </button>
+                            </td>
+                            <td class="product-thumbnail">
+                                <img width="180" height="180" alt="" class="wp-post-image" src="<?= base_url(); ?>/logotoko.png">
+                            </td>
+                            <td data-title="Product" class="product-name">
+                                <div class="media cart-item-product-detail">
+                                    <img width="180" height="180" alt="" class="wp-post-image" src="<?= base_url('img/produk') . '/' . $kir['gambar_produk']; ?>">
+                                    <div class="media-body align-self-center">
+                                        <a href="<?= base_url('produk/detail') . '/' . $kir['id_produk'] ?>">
+                                            <strong><?= $kir['nama_produk'] ?></strong>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-title="Order Number" class="product-price">
+                                <span class="woocommerce-Price-amount amount">
+                                    <span><i>@<?= $kir['nama_toko'] ?></i></span>
+                                </span>
+                            </td>
+                            <td data-title="Nominal" class="product-price">
+                                <span class="woocommerce-Price-amount amount">
+                                    <span class="woocommerce-Price-currencySymbol">Rp. </span><?= number_format($kir['harga_produk']) ?>
+                                </span>
+                            </td>
+                            <td data-title="Jumlah Pesanan" class="product-price">
+                                <span>
+                                    <?= $kir['jumlah'] ?>
+                                </span>
+                            </td>
+                            <td data-title="Pesan ke penjual">
+                                <span><?= $kir['pesan'] == '' ? 'Tidak ada pesan' : $kir['pesan'] ?></span>
+                            </td>
+                            <td data-title="Status">
+                                <span>Pesanan dikirim</span>
+                            </td>
+                            <td data-title="Aksi">
+                                <form action="<?= base_url('user/order/canceltransaksi') . '/' . $kir['id'] ?>" method="post">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                            data-nama="<?= $kir['nama_produk'] ?>">Batalkan
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                <?php endforeach; ?>
+            </center>
+            <hr style="border-top: 2px dashed green;">
+            <?php endif; ?>
+            <?php if ($tolak) : ?>
+            <center>
+                <h1>Pesanan ditolak</h1>
+                <?php foreach ($tolak[4] as $tol) : ?>
+                    <table class="shop_table shop_table_responsive cart">
+                        <thead>
+                        <tr>
+                            <th class="product-remove">&nbsp;</th>
+                            <th class="product-thumbnail">&nbsp;</th>
+                            <th class="product-name">Produk</th>
+                            <th class="product-name">Store</th>
+                            <th class="product-price">Harga</th>
+                            <th class="product-price">Jumlah</th>
+                            <th class="product-quantity">Pesan</th>
+                            <th class="product-quantity">Status</th>
+                            <th class="product-quantity">Aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="product-remove">
+                                <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                        data-nama="<?= $tol['nama_produk'] ?>">Hapus
+                                </button>
+                            </td>
+                            <td class="product-thumbnail">
+                                <img width="180" height="180" alt="" class="wp-post-image" src="<?= base_url(); ?>/logotoko.png">
+                            </td>
+                            <td data-title="Product" class="product-name">
+                                <div class="media cart-item-product-detail">
+                                    <img width="180" height="180" alt="" class="wp-post-image" src="<?= base_url('img/produk') . '/' . $tol['gambar_produk']; ?>">
+                                    <div class="media-body align-self-center">
+                                        <a href="<?= base_url('produk/detail') . '/' . $tol['id_produk'] ?>">
+                                            <strong><?= $tol['nama_produk'] ?></strong>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td data-title="Order Number" class="product-price">
+                                <span class="woocommerce-Price-amount amount">
+                                    <span><i>@<?= $tol['nama_toko'] ?></i></span>
+                                </span>
+                            </td>
+                            <td data-title="Nominal" class="product-price">
+                                <span class="woocommerce-Price-amount amount">
+                                    <span class="woocommerce-Price-currencySymbol">Rp. </span><?= number_format($tol['harga_produk']) ?>
+                                </span>
+                            </td>
+                            <td data-title="Jumlah Pesanan" class="product-price">
+                                <span>
+                                    <?= $tol['jumlah'] ?>
+                                </span>
+                            </td>
+                            <td data-title="Pesan ke penjual">
+                                <span><?= $tol['pesan'] == '' ? 'Tidak ada pesan' : $tol['pesan'] ?></span>
+                            </td>
+                            <td data-title="Status">
+                                <span>Pesanan ditolak</span>
+                            </td>
+                            <td data-title="Aksi">
+                                <form action="<?= base_url('user/order/canceltransaksi') . '/' . $tol['id'] ?>" method="post">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                            data-nama="<?= $tol['nama_produk'] ?>">Batalkan
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                <?php endforeach; ?>
+            </center>
+            <?php endif; ?>
         </div>
     </section>
 <?= $this->endSection(); ?>

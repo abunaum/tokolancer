@@ -111,6 +111,8 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->post('produk/edit/(:num)', 'User\toko::editproduk/$1');
         $routes->get('tambah', 'User\toko::tambah');
         $routes->post('tambahproduk', 'User\toko::tambahproduk');
+        $routes->get('transaksi', 'User\toko::transaksi');
+        $routes->delete('batalkan/(:num)', 'User\toko::batalkanpesanan/$1');
     });
     $routes->group('order', function ($routes) {
         $routes->post('produk/(:num)', 'User\order::produk/$1');

@@ -244,6 +244,19 @@ class order extends BaseController
         $keranjang->where('buyer', user()->id);
         $keranjang->where('keranjang.status', 2);
         $keranjang = $keranjang->findAll();
+        $invgroup = [];
+        foreach($keranjang as $value){
+            $invgroup[$value['invoice']][] = $value;
+        }
+        $invgr = [];
+        foreach ($invgroup as $type => $labels) {
+            $tr = $newinv->where('kode', $type)->first();
+            $invgr[] = [
+                'kode' => $type,
+                'payment' => $tr,
+                'data' => $labels,
+            ];
+        }
 
         $paid = $this->keranjang;
         $paid->join('produk', 'produk.id = keranjang.produk', 'LEFT');
@@ -261,26 +274,48 @@ class order extends BaseController
         $paid->where('buyer', user()->id);
         $paid->where('keranjang.status !=', 1);
         $paid->where('keranjang.status !=', 2);
+        $paid->orderBy('keranjang.updated_at', 'DESC');
         $paid = $paid->findAll();
 
-        $invgroup = [];
-        foreach($keranjang as $value){
-            $invgroup[$value['invoice']][] = $value;
+        $paidgroup = [];
+        foreach($paid as $value){
+            $paidgroup[$value['status']][] = $value;
         }
-        $invgr = [];
-        foreach ($invgroup as $type => $labels) {
-            $tr = $newinv->where('kode', $type)->first();
-            $invgr[] = [
-                'kode' => $type,
-                'payment' => $tr,
-                'data' => $labels,
-            ];
-        }
+//        $paidgr = [];
+//        foreach ($paidgroup as $type => $labels) {
+//            $paidgr[] = [
+//                'kode' => $type,
+//                'data' => $labels,
+//            ];
+//        }
+        $lunas = array_filter($paidgroup, function ($key) {
+            return $key == '3';
+        }, ARRAY_FILTER_USE_KEY);
+
+        $tolak = array_filter($paidgroup, function ($key) {
+            return $key == '4';
+        }, ARRAY_FILTER_USE_KEY);
+
+        $kirim = array_filter($paidgroup, function ($key) {
+            return $key == '5';
+        }, ARRAY_FILTER_USE_KEY);
+
+        $selesai = array_filter($paidgroup, function ($key) {
+            return $key == '6';
+        }, ARRAY_FILTER_USE_KEY);
+
+        $bermasalah = array_filter($paidgroup, function ($key) {
+            return $key == '7';
+        }, ARRAY_FILTER_USE_KEY);
         $data = [
             'judul' => "Invoice | $this->namaweb",
             'item' => $item,
             'invoice' => $invgr,
-            'transaksi' => $paid,
+            'transaksi' => $lunas,
+            'tolak' => $tolak,
+            'kirim' =>$kirim,
+            'selesai' => $selesai,
+            'bermasalah' => $bermasalah,
             'total_invoice' => count($invgr)
         ];
 
@@ -291,6 +326,7 @@ class order extends BaseController
     {
         $inv = $this->invoice->where('id', $id)->first();
         $cek = json_decode(detailtransaksi(datapayment(),$inv['referensi']), true);
+//        dd($cek);
         if ($cek['success'] != true){
             session()->setFlashdata('error', 'Terjadi kesalahan');
             return redirect()->to(base_url('user/order/transaksi'));
