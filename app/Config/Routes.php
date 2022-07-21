@@ -113,6 +113,7 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->post('tambahproduk', 'User\toko::tambahproduk');
         $routes->get('transaksi', 'User\toko::transaksi');
         $routes->delete('batalkan/(:num)', 'User\toko::batalkanpesanan/$1');
+        $routes->post('kirim/(:num)', 'User\toko::kirimproduk/$1');
     });
     $routes->group('order', function ($routes) {
         $routes->post('produk/(:num)', 'User\order::produk/$1');
@@ -124,6 +125,12 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->delete('invoice/(:num)', 'User\order::hapusinvoice/$1');
         $routes->post('proses', 'User\order::proseskeranjang');
         $routes->post('edit/(:num)', 'User\order::editkeranjang/$1');
+        $routes->delete('deletetransaksi/(:num)', 'User\order::hapustransaksi/$1');
+        $routes->delete('canceltransaksi/(:num)', 'User\order::canceltransaksi/$1');
+        $routes->get('detailtransaksi/(:num)', 'User\order::detailtransaksi/$1');
+        $routes->post('updatetransaksi/(:num)', 'User\order::updatetransaksi/$1');
+        $routes->post('transaksiselesai/(:num)', 'User\order::transaksiselesai/$1');
+        $routes->post('transaksibermasalah/(:num)', 'User\order::transaksibermasalah/$1');
     });
     $routes->group('keranjang', function ($routes) {
         $routes->get('produk/(:num)', 'User\order::tambahkeranjang/$1');

@@ -96,12 +96,70 @@
                 <div class="card w-75 mt-3 mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Ooops !</h5>
-                        <p class="card-text">Invoice kosong.</p>
+                        <p class="card-text">Transaksi kosong.</p>
                     </div>
                     <!-- .woocommerce -->
                 </div>
                 <hr style="border-top: 2px dashed green;">
             </center>
+        <?php endif; ?>
+        <?php if (count($riwayat) >= 1) : ?>
+        <h5>Transaksi Terproses</h5>
+            <?php foreach ($riwayat as $r) : ?>
+                <table class="shop_table shop_table_responsive cart">
+                    <thead>
+                    <tr>
+                        <th class="product-remove">&nbsp;</th>
+                        <th class="product-thumbnail">&nbsp;</th>
+                        <th class="product-name">Kode</th>
+                        <th class="product-name">Nama Produk</th>
+                        <th class="product-price">Jumlah Order</th>
+                        <th class="product-quantity">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="product-remove">
+                            <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
+                                    data-nama="<?= $r['id']; ?>">Tolak
+                            </button>
+                        </td>
+                        <td data-title="Kode" class="product-name">
+                            <div class="media cart-item-product-detail">
+                                <div class="media-body align-self-center">
+                                    <strong><?= $r['invoice']; ?></strong>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-title="Nama Produk">
+                            <span><?= $r['nama']; ?></span>
+                        </td>
+                        <td data-title="Nominal" class="product-price">
+                            <?= $r['jumlah']; ?>
+                        </td>
+                        <td data-title="Status">
+                            <span>
+                                <?php
+                                if ($r['status'] == 1){
+                                    echo "Dikirim, Menunggu respon buyer";
+                                }
+                                elseif ($r['status'] == 2){
+                                    echo "Terkirim, Menunggu konfirmasi seller";
+                                }
+                                elseif ($r['status'] == 3){
+                                    echo "Transaksi Selesai";
+                                }
+                                else{
+                                    echo 'Bermasalah, Harap hubungi <a href="https://t.me/abu_naum">CS</a>';
+                                }
+                                ?>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr style="border-top: 1px dashed black;">
+            <?php endforeach; ?>
         <?php endif; ?>
     </div>
 </section>

@@ -15,7 +15,7 @@ class order extends BaseController
     {
         $this->apilib = new PaymentApiLibrary();
         $this->getitem = new Itemlibrary();
-        helper('payment');
+        helper(['payment','tele']);
     }
     public function produk($id = 0)
     {
@@ -281,13 +281,6 @@ class order extends BaseController
         foreach($paid as $value){
             $paidgroup[$value['status']][] = $value;
         }
-//        $paidgr = [];
-//        foreach ($paidgroup as $type => $labels) {
-//            $paidgr[] = [
-//                'kode' => $type,
-//                'data' => $labels,
-//            ];
-//        }
         $lunas = array_filter($paidgroup, function ($key) {
             return $key == '3';
         }, ARRAY_FILTER_USE_KEY);
@@ -326,7 +319,6 @@ class order extends BaseController
     {
         $inv = $this->invoice->where('id', $id)->first();
         $cek = json_decode(detailtransaksi(datapayment(),$inv['referensi']), true);
-//        dd($cek);
         if ($cek['success'] != true){
             session()->setFlashdata('error', 'Terjadi kesalahan');
             return redirect()->to(base_url('user/order/transaksi'));
@@ -345,5 +337,230 @@ class order extends BaseController
         $this->invoice->where('id', $id)->purgeDeleted();
         session()->setFlashdata('pesan', 'Transaksi '. $kode . 'sudah di hapus');
         return redirect()->to(base_url('user/order/transaksi'));
+    }
+    public function hapustransaksi($id =0)
+    {
+        $cek = $this->keranjang;
+        $cek = $cek->where('id', $id)->first();
+        if ($cek['buyer'] != user()->id) {
+            return redirect()->to(base_url('user/order/trannsaksi'));
+        }
+        $keranjang = $this->keranjang;
+        $keranjang->where('id', $id);
+        $keranjang->where('status', 4);
+        $keranjang->orwhere('status', 6);
+        $keranjang->delete();
+        session()->setFlashdata('pesan', 'Transaksi berhasil di hapus');
+        return redirect()->to(base_url('user/order/transaksi'));
+    }
+    public function canceltransaksi($id =0)
+    {
+        $keranjang = $this->keranjang;
+        $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $keranjang->select('keranjang.*');
+        $keranjang->select('produk.nama');
+        $keranjang->select('produk.harga');
+        $keranjang->where('keranjang.id', $id);
+        $keranjang->where('keranjang.status', 3);
+        $keranjang = $keranjang->first();
+        if (!$keranjang){
+            session()->setFlashdata('error', 'Terjadi kesalahan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        if ($keranjang['buyer'] != user()->id) {
+            return redirect()->to(base_url('user/order/trannsaksi'));
+        }
+        $getbuyer = $this->users->where('id', $keranjang['buyer'])->first();
+        $balance = $getbuyer['balance'];
+        $this->users->update(
+            $keranjang['buyer'],
+            [
+                'balance' => $balance + ($keranjang['harga'] * $keranjang['jumlah'])
+            ]
+        );
+        $pesan = 'Pesanan anda "'. $keranjang['nama'] .'" telah dibatalkan, \n Tapi jangan hawatir, dana anda telah dikembalikan ke saldo';
+        if ($getbuyer['telecode'] == 'valid'){
+            kirimpesan($getbuyer['teleid'], $pesan);
+        }
+        $this->keranjang->where('id', $id)->delete();
+        session()->setFlashdata('pesan', 'Transaksi berhasil di batalkan');
+        return redirect()->to(base_url('user/order/transaksi'));
+    }
+
+    public function detailtransaksi($id = 0)
+    {
+//        dd($id);
+        $item = $this->getitem->getsub();
+        $keranjang = $this->keranjang;
+        $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $keranjang->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $keranjang->join('pesanan_dikirim', 'pesanan_dikirim.keranjang = keranjang.id', 'LEFT');
+        $keranjang->select('keranjang.*');
+        $keranjang->select('produk.nama');
+        $keranjang->select('produk.gambar');
+        $keranjang->select('produk.harga');
+        $keranjang->select('toko.username');
+        $keranjang->select('pesanan_dikirim.status as status_kiriman');
+        $keranjang->select('pesanan_dikirim.nominal as nominal_transaksi');
+        $keranjang->select('pesanan_dikirim.detail');
+        $keranjang->where('keranjang.id', $id);
+        $keranjang->where('keranjang.buyer', user()->id);
+        $keranjang->where('keranjang.status !=', 1);
+        $keranjang->where('keranjang.status !=', 2);
+        $keranjang->where('keranjang.status !=', 3);
+        $keranjang->where('keranjang.status !=', 4);
+        $transaksi = $keranjang->first();
+        if (!$transaksi){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $data = [
+            'judul' => "Invoice | $this->namaweb",
+            'item' => $item,
+            'transaksi' => (object)$transaksi
+        ];
+
+        return view('halaman/user/detailtransaksi', $data);
+    }
+
+    public function updatetransaksi($id = 0){
+        $keranjang = $this->keranjang;
+        $keranjang->where('keranjang.id', $id);
+        $keranjang->where('keranjang.buyer', user()->id);
+        $transaksi = $keranjang->first();
+        if (!$transaksi){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $kirim = $this->kirimpesanan;
+        $pesanan = $kirim->where('keranjang', $id)->first();
+        if (!$pesanan){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $this->kirimpesanan->update(
+            $pesanan['id'],
+            [
+                'status' => 2
+            ]
+        );
+        session()->setFlashdata('pesan', 'Transaksi tidak ditemukan');
+        return redirect()->to(base_url('user/order/detailtransaksi').'/'.$id);
+    }
+
+    public function transaksiselesai($id = 0){
+        $keranjang = $this->keranjang;
+        $keranjang->where('keranjang.id', $id);
+        $keranjang->where('keranjang.buyer', user()->id);
+        $transaksi = $keranjang->first();
+        if (!$transaksi){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $kirim = $this->kirimpesanan;
+        $pesanan = $kirim->where('keranjang', $id)->first();
+        if (!$pesanan){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $this->keranjang->update(
+            $id,
+            [
+                'status' => 6
+            ]
+        );
+        $this->kirimpesanan->update(
+            $pesanan['id'],
+            [
+                'status' => 3
+            ]
+        );
+        $getseller = $this->keranjang;
+        $getseller->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $getseller->join('users', 'users.id = produk.owner', 'LEFT');
+        $keranjang->join('pesanan_dikirim', 'pesanan_dikirim.keranjang = keranjang.id', 'LEFT');
+        $getseller->select('keranjang.*');
+        $getseller->select('pesanan_dikirim.*');
+        $getseller->select('produk.owner');
+        $getseller->select('users.teleid');
+        $getseller->select('users.telecode');
+        $seller= $getseller->where('keranjang.id', $id);
+        $seller = $seller->first();
+
+
+        $fee = file_get_contents(ROOTPATH . "config.json");
+        $config = json_decode($fee, TRUE);
+        $fee = $config['feemc'];
+
+        $dataseller = $this->users->where('id', $seller['owner'])->first();
+        $saldoseller = $dataseller['balance'];
+        $saldotambahan = $seller['nominal'] - ($seller['nominal']*($fee['percent']/100));
+
+        $pesan = 'Transaksi dengan kode "' . $seller['invoice'] . '" telah selesai. \n'.number_to_currency($saldotambahan, 'IDR', 'id_ID', 0).' ('.number_to_currency($seller['nominal'], 'IDR', 'id_ID', 0).' - '.$fee['percent'].'%) telah ditambahkan ke saldo anda. \n'.'Total saldo saat ini '. number_to_currency($saldoseller+$saldotambahan, 'IDR', 'id_ID', 0);
+        if ($seller['telecode'] == 'valid') {
+            kirimpesan($seller['teleid'], $pesan);
+        }
+        $this->users->update(
+            $seller['owner'],
+            [
+                'balance' =>$saldoseller+$saldotambahan
+            ]
+        );
+        session()->setFlashdata('pesan', 'Dana berhasil dilepaskan ke seller');
+        return redirect()->to(base_url('user/order/detailtransaksi').'/'.$id);
+    }
+
+    public function transaksibermasalah($id = 0)
+    {
+        $keranjang = $this->keranjang;
+        $keranjang->where('keranjang.id', $id);
+        $keranjang->where('keranjang.buyer', user()->id);
+        $transaksi = $keranjang->first();
+        if (!$transaksi){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $kirim = $this->kirimpesanan;
+        $pesanan = $kirim->where('keranjang', $id)->first();
+        if (!$pesanan){
+            session()->setFlashdata('error', 'Transaksi tidak ditemukan');
+            return redirect()->to(base_url('user/order/transaksi'));
+        }
+        $this->keranjang->update(
+            $id,
+            [
+                'status' => 7
+            ]
+        );
+        $this->kirimpesanan->update(
+            $pesanan['id'],
+            [
+                'status' => 4
+            ]
+        );
+        $getseller = $this->keranjang;
+        $getseller->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $getseller->join('users', 'users.id = produk.owner', 'LEFT');
+        $keranjang->join('pesanan_dikirim', 'pesanan_dikirim.keranjang = keranjang.id', 'LEFT');
+        $getseller->select('keranjang.*');
+        $getseller->select('pesanan_dikirim.*');
+        $getseller->select('produk.owner');
+        $getseller->select('users.teleid');
+        $getseller->select('users.telecode');
+        $seller= $getseller->where('keranjang.id', $id);
+        $seller = $seller->first();
+
+        $kode = $transaksi['invoice'].'-'.$transaksi['id'];
+        $pesan = 'Transaksi dengan kode "' . $seller['invoice'] . '" bermasalah. \n Harap segera hubungi CS \n kode transaksi : '. $kode;
+        if ($seller['telecode'] == 'valid') {
+            kirimpesan($seller['teleid'], $pesan);
+        }
+        $pesanbuyer = 'Transaksi dengan kode "' . $seller['invoice'] . '" bermasalah. \n Harap segera hubungi CS \n kode transaksi : '. $kode;
+        if (user()->telecode == 'valid') {
+            kirimpesan(user()->teleid, $pesan);
+        }
+
+        session()->setFlashdata('pesan', 'Dana berhasil ditahan, Harap segera hubungi CS');
+        return redirect()->to(base_url('user/order/detailtransaksi').'/'.$id);
     }
 }

@@ -16,7 +16,7 @@ class Callback extends BaseController
     public function callback()
     {
 
-        helper('payment');
+        helper(['payment','tele']);
         $payment = datapayment();
         $json = file_get_contents('php://input');
 
@@ -43,18 +43,6 @@ class Callback extends BaseController
             exit('Invalid callback event, no action was taken');
         }
 
-        $keranjang = $this->keranjang;
-        $keranjang->where('invoice', $data['merchant_ref']);
-        $keranjang = $keranjang->findAll();
-        foreach ($keranjang as $k) {
-            $kid = $k['id'];
-            $this->keranjang->update(
-                $kid,
-                [
-                    'status' => 3,
-                ]
-            );
-        }
         $invoice = $this->invoice;
         $invoice->where('kode', $data['merchant_ref']);
         $invoice = $invoice->findAll();
@@ -73,6 +61,33 @@ class Callback extends BaseController
                 'data' => $data
             ]
         );
+        if ($data['status'] == 'PAID') {
+            $keranjang = $this->keranjang;
+            $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+            $keranjang->join('users', 'users.id = produk.owner', 'LEFT');
+            $keranjang->select('keranjang.*');
+            $keranjang->select('produk.nama');
+            $keranjang->select('produk.owner');
+            $keranjang->select('users.telecode');
+            $keranjang->select('users.teleid');
+            $keranjang->where('invoice', $data['merchant_ref']);
+            $keranjang = $keranjang->findAll();
+//        return $this->respond($keranjang, 200);
+            foreach ($keranjang as $k) {
+                $kid = $k['id'];
+                $this->keranjang->update(
+                    $kid,
+                    [
+                        'status' => 3,
+                    ]
+                );
+                $pesan = 'Produk anda "' . $k['nama'] . '" telah dipesan dengan jumlah x' . $k['jumlah'] . ', yuk cek di ' . base_url('user/toko/transaksi');
+                if ($k['telecode'] == 'valid') {
+                    kirimpesan($k['teleid'], $pesan);
+                }
+
+            }
+        }
         return $this->respond($res, 200);
     }
 }

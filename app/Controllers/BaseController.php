@@ -60,6 +60,7 @@ class BaseController extends Controller
         $this->apipayment = new \App\Models\ApiPaymentModel();
         $this->keranjang = new \App\Models\Keranjang();
         $this->invoice = new \App\Models\Invoice();
+        $this->kirimpesanan = new \App\Models\Kirimpesanan();
 
         //helper
         helper(['item' ,'auth','user','number']);

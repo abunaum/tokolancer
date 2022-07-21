@@ -12,5 +12,8 @@
         "urldetailtransaksi": "https://payment.tripay.co.id/api-sandbox/transaction/detail?",
         "kodemerchant": "T1438",
         "callback": "api/proses/gasspol/mantap/callback"
+    },
+    "feemc": {
+        "percent" : 5
     }
 }

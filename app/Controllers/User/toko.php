@@ -192,8 +192,9 @@ class toko extends BaseController
             return redirect()->to(base_url('user/toko/produk/detail') . '/' . $id)->withInput();
         }
         if ($gambar->getError() == 4) {
-            $this->produk->save([
-                'id' => $id,
+            $this->produk->update(
+                $id,
+                [
                 'nama' => $nama,
                 'keterangan' => $keterangan,
                 'harga' => $harga,
@@ -203,8 +204,9 @@ class toko extends BaseController
             @unlink('img/produk/' . $produk['gambar']);
             $namagambar = $gambar->getRandomName();
             $gambar->move('img/produk', $namagambar);
-            $this->produk->save([
-                'id' => $id,
+            $this->produk->update(
+                $id,
+                [
                 'nama' => $nama,
                 'keterangan' => $keterangan,
                 'harga' => $harga,
@@ -251,11 +253,25 @@ class toko extends BaseController
         $paid->where('keranjang.status', 3);
         $paid = $paid->findAll();
         $totalpaid = count($paid);
+
+        $riwayat = $this->kirimpesanan;
+        $riwayat->join('keranjang', 'keranjang.id = pesanan_dikirim.keranjang', 'LEFT');
+        $riwayat->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $riwayat->select('pesanan_dikirim.*');
+        $riwayat->select('keranjang.invoice');
+        $riwayat->select('produk.nama');
+        $riwayat->select('keranjang.jumlah');
+        $riwayat->select('produk.owner');
+        $riwayat->where('produk.owner', user()->id);
+        $riwayat = $riwayat->orderBy('created_at','DESC')->findAll();
+//        dd($riwayat);
+
         $data = [
             'judul' => "Transaksi | $this->namaweb",
             'item' => $item,
             'paid' => $paid,
-            'total_paid' => $totalpaid
+            'total_paid' => $totalpaid,
+            'riwayat' => $riwayat
         ];
         return view('Toko/transaksi/listtransaksi', $data);
     }
@@ -266,9 +282,11 @@ class toko extends BaseController
         $pesanan->join('produk', 'produk.id = keranjang.produk', 'LEFT');
         $pesanan->join('users', 'users.id = keranjang.buyer', 'LEFT');
         $pesanan->select('keranjang.*');
+        $pesanan->select('produk.nama');
         $pesanan->select('produk.harga');
         $pesanan->select('produk.owner');
         $pesanan->where('keranjang.id', $id);
+        $pesanan->where('keranjang.status', 3);
         $pesanan->where('produk.owner', user()->id);
         $pesanan = $pesanan->first();
 //        dd($pesanan);
@@ -291,7 +309,50 @@ class toko extends BaseController
                 'balance' => $balance + ($pesanan['harga'] * $pesanan['jumlah'])
             ]
         );
+        $pesan = 'Pesanan anda "'. $pesanan['nama'] .'" telah dibatalkan oleh seller, \n Tapi jangan hawatir, dana anda telah dikembalikan ke saldo';
+        if ($getbuyer['telecode'] == 'valid'){
+            kirimpesan($getbuyer['teleid'], $pesan);
+        }
         session()->setFlashdata('pesan', 'Pesanan berhasil dibatalkan');
+        return redirect()->to(base_url('user/toko/transaksi'));
+    }
+
+    public function kirimproduk($id = 0){
+        $detail = $this->request->getVar('pesan');
+        $pesanan = $this->keranjang;
+        $pesanan->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $pesanan->join('users', 'users.id = keranjang.buyer', 'LEFT');
+        $pesanan->select('keranjang.*');
+        $pesanan->select('produk.nama');
+        $pesanan->select('produk.harga');
+        $pesanan->select('produk.owner');
+        $pesanan->where('keranjang.id', $id);
+        $pesanan->where('keranjang.status', 3);
+        $pesanan->where('produk.owner', user()->id);
+        $pesanan = $pesanan->first();
+        if (!$pesanan){
+            session()->setFlashdata('error', 'Pesanan tidak ditemukan');
+            return redirect()->to(base_url('user/toko/transaksi'));
+        }
+        $this->keranjang->update(
+            $id,
+            [
+                'pesan' => 'Pesanan dikirim, Menunggu respon buyer',
+                'status' => 5
+            ]
+        );
+        $this->kirimpesanan->save([
+            'keranjang' => $pesanan['id'],
+            'nominal' => $pesanan['harga']*$pesanan['jumlah'],
+            'detail' => $detail,
+            'status' => 1
+        ]);
+        $getbuyer = $this->users->where('id', $pesanan['buyer'])->first();
+        $pesanbuyer = 'Pesanan anda "'. $pesanan['nama'] .'" telah dikirim oleh seller, \n silahkan cek pesanan anda di'. base_url('user/order/transaksi');
+        if ($getbuyer['telecode'] == 'valid'){
+            kirimpesan($getbuyer['teleid'], $pesanbuyer);
+        }
+        session()->setFlashdata('pesan', 'Pesanan berhasil dikirim');
         return redirect()->to(base_url('user/toko/transaksi'));
     }
 }
