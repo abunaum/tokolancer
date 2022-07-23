@@ -24,7 +24,7 @@
                         <i>Stok : <?= $produk->stok; ?></i>
                     </p>
                     <p class="text-muted text-uppercase small">
-                        Store : <i>@<?= $toko->username; ?></i>
+                        Store : <i>@<?= $produk->username_toko; ?></i>
                     </p>
                     <div>
                         <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
@@ -44,9 +44,19 @@
                     <hr>
                     <div class="mb-3">
                         <?php if (session('logged_in') != true) : ?>
-                            <a type="button" class="btn btn-success" href="<?= base_url('login?url='. str_replace("index.php/","",current_url()));?>">Login untuk membeli</a>
+                            <a type="button" class="btn btn-success"
+                               href="<?= base_url('login?url=' . str_replace("index.php/", "", current_url())); ?>">Login
+                                untuk membeli</a>
                         <?php else : ?>
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#orderModal">Beli</button>
+                            <?php if ($produk->status_toko != 1) : ?>
+                                <span>
+                                    <strong>Toko sedang tutup</strong>
+                                </span>
+                            <?php else : ?>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#orderModal">Beli
+                                </button>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </center>
@@ -71,7 +81,7 @@
                                 </span>
 
                                 <h2 class="woocommerce-loop-product__title"><?= $pu['nama']; ?></h2>
-                                <h2 class="woocommerce-loop-product__title"><i>@<?= $toko->username; ?></i></h2>
+                                <h2 class="woocommerce-loop-product__title"><i>@<?= $pu['username_toko']; ?></i></h2>
                             </a>
 
                             <div class="hover-area">

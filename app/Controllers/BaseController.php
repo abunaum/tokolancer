@@ -63,7 +63,7 @@ class BaseController extends Controller
         $this->kirimpesanan = new \App\Models\Kirimpesanan();
 
         //helper
-        helper(['item' ,'auth','user','number']);
+        helper(['item' ,'auth','user','number','config']);
         // E.g.: $this->session = \Config\Services::session();
     }
 }

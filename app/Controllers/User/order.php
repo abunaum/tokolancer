@@ -164,6 +164,7 @@ class order extends BaseController
         $keranjang = $this->keranjang;
         $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');
         $hasilkeranjang = $keranjang->where('buyer', user()->id);
+        $hasilkeranjang = $keranjang->where('status', 1);
         $keranjang = $hasilkeranjang->findAll();
         $hp = [];
         foreach ($keranjang as $k) {

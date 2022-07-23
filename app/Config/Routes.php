@@ -32,6 +32,7 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
+$routes->get('jenis/(:num)', 'Home::jenis/$1');
 $routes->get('login', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
 $routes->group('auth', function ($routes) {
@@ -114,6 +115,8 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->get('transaksi', 'User\toko::transaksi');
         $routes->delete('batalkan/(:num)', 'User\toko::batalkanpesanan/$1');
         $routes->post('kirim/(:num)', 'User\toko::kirimproduk/$1');
+        $routes->get('saldo', 'User\toko::saldo');
+        $routes->post('cairkan', 'User\toko::cairkan');
     });
     $routes->group('order', function ($routes) {
         $routes->post('produk/(:num)', 'User\order::produk/$1');

@@ -15,5 +15,9 @@
     },
     "feemc": {
         "percent" : 5
+    },
+    "cair": {
+        "minimal" : 50000,
+        "fee" : 4500
     }
 }

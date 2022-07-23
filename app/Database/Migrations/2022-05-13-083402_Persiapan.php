@@ -45,29 +45,6 @@ class Persiapan extends Migration
         $this->forge->addForeignKey('iduser', 'users', 'id', false, 'CASCADE');
         $this->forge->createTable('role', true);
 
-
-        /*
-         * Apipayment
-         */
-        $this->forge->addField([
-            'id'				 => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-            'apikey'			 => ['type' => 'varchar', 'constraint' => 255],
-            'apiprivatekey'      => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'urlpaymentchannel'  => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'urlfeekalkulator'   => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'urlcreatepayment'   => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'urldetailtransaksi' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'kodemerchant'	     => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'callback'		     => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-            'created_at'         => ['type' => 'datetime', 'null' => true],
-            'updated_at'         => ['type' => 'datetime', 'null' => true],
-            'deleted_at'         => ['type' => 'datetime', 'null' => true],
-        ]);
-
-        $this->forge->addKey('id', true);
-
-        $this->forge->createTable('apipayment', true);
-
         /*
          * item
          */
@@ -132,21 +109,18 @@ class Persiapan extends Migration
          */
         $this->forge->addField([
             'id'		=> ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-            'owner'		=> ['type' => 'int', 'constraint' => 11, 'unsigned' => true],
-            'jenis'	 	=> ['type' => 'varchar', 'constraint' => 30],
-            'order_number'	 	=> ['type' => 'varchar', 'constraint' => 30],
+            'user'		=> ['type' => 'int', 'constraint' => 11, 'unsigned' => true],
             'nominal'	 	=> ['type' => 'varchar', 'constraint' => 30],
-            'fee'	 	=> ['type' => 'int', 'constraint' => 30],
-            'metode'	 	=> ['type' => 'varchar', 'constraint' => 50],
+            'fee'	 	=> ['type' => 'varchar', 'constraint' => 30],
             'status'	 	=> ['type' => 'varchar', 'constraint' => 20],
-            'reference'	 	=> ['type' => 'varchar', 'constraint' => 255],
+            'keterangan'	 	=> ['type' => 'varchar', 'constraint' => 255],
             'created_at' => ['type' => 'datetime', 'null' => true],
             'updated_at' => ['type' => 'datetime', 'null' => true],
             'deleted_at' => ['type' => 'datetime', 'null' => true],
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addForeignKey('owner', 'users', 'id', false, 'CASCADE');
+        $this->forge->addForeignKey('user', 'users', 'id', false, 'CASCADE');
         $this->forge->createTable('transaksi_saldo', true);
 
         /*
@@ -219,7 +193,7 @@ class Persiapan extends Migration
         if ($this->db->DBDriver != 'SQLite3') {
             $this->forge->dropForeignKey('subitem', 'subitem_item_foreign');
             $this->forge->dropForeignKey('toko', 'toko_userid_foreign');
-            $this->forge->dropForeignKey('transaksi_saldo', 'transaksi_saldo_owner_foreign');
+            $this->forge->dropForeignKey('transaksi_saldo', 'transaksi_saldo_user_foreign');
             $this->forge->dropForeignKey('produk', 'produk_jenis_foreign');
             $this->forge->dropForeignKey('produk', 'produk_owner_foreign');
             $this->forge->dropForeignKey('keranjang', 'keranjang_buyer_foreign');
@@ -228,7 +202,6 @@ class Persiapan extends Migration
         }
 
         $this->forge->dropTable('users', true);
-        $this->forge->dropTable('apipayment', true);
         $this->forge->dropTable('produk', true);
         $this->forge->dropTable('item', true);
         $this->forge->dropTable('subitem', true);

@@ -100,16 +100,15 @@
                     </div>
                     <!-- .woocommerce -->
                 </div>
-                <hr style="border-top: 2px dashed green;">
             </center>
         <?php endif; ?>
-        <?php if (count($riwayat) >= 1) : ?>
-        <h5>Transaksi Terproses</h5>
-            <?php foreach ($riwayat as $r) : ?>
+        <?php if (count($bermasalah) >= 1) : ?>
+            <hr style="border-top: 2px dashed red;">
+        <h5>Transaksi Bermasalah</h5>
+            <?php foreach ($bermasalah as $b) : ?>
                 <table class="shop_table shop_table_responsive cart">
                     <thead>
                     <tr>
-                        <th class="product-remove">&nbsp;</th>
                         <th class="product-thumbnail">&nbsp;</th>
                         <th class="product-name">Kode</th>
                         <th class="product-name">Nama Produk</th>
@@ -119,11 +118,47 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="product-remove">
-                            <button type="button" class="btn btn-danger delete-one" style="width: 100%;"
-                                    data-nama="<?= $r['id']; ?>">Tolak
-                            </button>
+                        <td data-title="Kode" class="product-name">
+                            <div class="media cart-item-product-detail">
+                                <div class="media-body align-self-center">
+                                    <strong><?= $b['invoice']; ?></strong>
+                                </div>
+                            </div>
                         </td>
+                        <td data-title="Nama Produk">
+                            <span><?= $b['nama']; ?></span>
+                        </td>
+                        <td data-title="Nominal" class="product-price">
+                            <?= $b['jumlah']; ?>
+                        </td>
+                        <td data-title="Status">
+                            <span>
+                                Bermasalah, Harap hubungi <a href="https://t.me/abu_naum">CS</a>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr style="border-top: 1px dashed black;">
+            <?php endforeach; ?>
+            <hr style="border-top: 2px dashed red;">
+        <?php endif; ?>
+        <?php if (count($riwayat) >= 1) : ?>
+            <hr style="border-top: 2px dashed green;">
+        <h5>Transaksi Terproses</h5>
+            <?php foreach ($riwayat as $r) : ?>
+                <table class="shop_table shop_table_responsive cart">
+                    <thead>
+                    <tr>
+                        <th class="product-thumbnail">&nbsp;</th>
+                        <th class="product-name">Kode</th>
+                        <th class="product-name">Nama Produk</th>
+                        <th class="product-price">Jumlah Order</th>
+                        <th class="product-quantity">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
                         <td data-title="Kode" class="product-name">
                             <div class="media cart-item-product-detail">
                                 <div class="media-body align-self-center">
@@ -160,6 +195,7 @@
                 </table>
                 <hr style="border-top: 1px dashed black;">
             <?php endforeach; ?>
+            <hr style="border-top: 2px dashed green;">
         <?php endif; ?>
     </div>
 </section>

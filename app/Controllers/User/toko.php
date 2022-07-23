@@ -262,8 +262,21 @@ class toko extends BaseController
         $riwayat->select('produk.nama');
         $riwayat->select('keranjang.jumlah');
         $riwayat->select('produk.owner');
+        $riwayat->where('keranjang.status !=', 7);
         $riwayat->where('produk.owner', user()->id);
         $riwayat = $riwayat->orderBy('created_at','DESC')->findAll();
+
+        $transaksibermasalah = $this->kirimpesanan;
+        $transaksibermasalah->join('keranjang', 'keranjang.id = pesanan_dikirim.keranjang', 'LEFT');
+        $transaksibermasalah->join('produk', 'produk.id = keranjang.produk', 'LEFT');
+        $transaksibermasalah->select('pesanan_dikirim.*');
+        $transaksibermasalah->select('keranjang.invoice');
+        $transaksibermasalah->select('produk.nama');
+        $transaksibermasalah->select('keranjang.jumlah');
+        $transaksibermasalah->select('produk.owner');
+        $transaksibermasalah->where('keranjang.status', 7);
+        $transaksibermasalah->where('produk.owner', user()->id);
+        $transaksibermasalah = $transaksibermasalah->orderBy('created_at','DESC')->findAll();
 //        dd($riwayat);
 
         $data = [
@@ -271,7 +284,8 @@ class toko extends BaseController
             'item' => $item,
             'paid' => $paid,
             'total_paid' => $totalpaid,
-            'riwayat' => $riwayat
+            'riwayat' => $riwayat,
+            'bermasalah' => $transaksibermasalah
         ];
         return view('Toko/transaksi/listtransaksi', $data);
     }
@@ -354,5 +368,54 @@ class toko extends BaseController
         }
         session()->setFlashdata('pesan', 'Pesanan berhasil dikirim');
         return redirect()->to(base_url('user/toko/transaksi'));
+    }
+
+    public function saldo()
+    {
+        $config = ambilconfig();
+        $item = $this->getitem->getsub();
+        $toko = $this->toko;
+        $toko->where('userid', user()->id);
+        $toko= $toko->first();
+        $data = [
+            'judul' => "Saldo toko | $this->namaweb",
+            'item' => $item,
+            'toko' => $toko,
+            'cair' => $config['cair'],
+            'validation' => \Config\Services::validation()
+        ];
+        return view('halaman/user/saldotoko', $data);
+    }
+    public function cairkan()
+    {
+        $config = ambilconfig();
+        $nominal = $this->request->getVar('nominal');
+
+        if (!$this->validate([
+            'nominal' => [
+                'rules' => 'required|is_natural_no_zero|greater_than_equal_to[50000]',
+                'errors' => [
+                    'required' => 'Nominal harus ada',
+                    'is_natural_no_zero' => 'Nominal tidak valid',
+                    'greater_than_equal_to' => 'Nominal error',
+                ],
+            ],
+        ])) {
+            session()->setFlashdata('error', 'Gagal request pencairan dana');
+            return redirect()->to(base_url('user/toko/saldo'))->withInput();
+        }
+        $bisadicairkan = user()->balance - $config['cair']['fee'];
+        if ($nominal > $bisadicairkan){
+            session()->setFlashdata('error', 'Nominal tidak valid');
+            return redirect()->to(base_url('user/toko/saldo'));
+        } elseif ($nominal < $config['cair']['minimal']){
+            session()->setFlashdata('error', 'Nominal tidak valid');
+            return redirect()->to(base_url('user/toko/saldo'));
+        } elseif ($bisadicairkan < $config['cair']['minimal']){
+            session()->setFlashdata('error', 'Nominal tidak valid');
+            return redirect()->to(base_url('user/toko/saldo'));
+        } else {
+            $transaksi = $this->transaksi_saldo;
+        }
     }
 }

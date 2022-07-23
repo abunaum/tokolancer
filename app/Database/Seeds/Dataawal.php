@@ -9,19 +9,6 @@ class Dataawal extends Seeder
 {
 	public function run()
 	{
-		$dataapi = [
-			'apikey' => 'DEV-hIvWW2APKrWpEO68PXC4LWKhU3h4oBui23eJNJIr',
-			'apiprivatekey'    => 'qLlfi-VMwzL-nXVl0-bFPpa-bt6YS',
-			'urlpaymentchannel' => 'https://payment.tripay.co.id/api-sandbox/merchant/payment-channel',
-			'urlfeekalkulator' => 'https://payment.tripay.co.id/api-sandbox/merchant/fee-calculator?',
-			'urlcreatepayment' => 'https://payment.tripay.co.id/api-sandbox/transaction/create',
-			'urldetailtransaksi' => 'https://payment.tripay.co.id/api-sandbox/transaction/detail?',
-			'kodemerchant' => 'T1438',
-			'callback' => 'api/proses/gasspol/mantap/callback',
-			'created_at' => Time::now('Asia/Jakarta', 'id_ID'),
-			'updated_at' => Time::now('Asia/Jakarta', 'id_ID')
-		];
-		$this->db->table('apipayment')->insert($dataapi);
 
 		$data_item = [
 			[
