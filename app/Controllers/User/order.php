@@ -13,7 +13,6 @@ class order extends BaseController
 
     public function __construct()
     {
-        $this->apilib = new PaymentApiLibrary();
         $this->getitem = new Itemlibrary();
         helper(['payment','tele']);
     }
@@ -30,9 +29,22 @@ class order extends BaseController
             return redirect()->to(base_url("produk/detail/$id"))->withInput();
         }
         $produk = $this->produk->where('id', $produkid)->first();
+        if (!$produk){
+            session()->setFlashdata('error', 'Produk tidak ditemukan !!!');
+            return redirect()->to(base_url("produk/detail/$produkid"));
+        }
         if ($produk['owner'] == user()->id) {
             session()->setFlashdata('error', 'Dilarang membeli produk sendiri !!!');
             return redirect()->to(base_url("produk/detail/$produkid"));
+        }
+        if ($produk['stok'] < $jumlah){
+            session()->setFlashdata('error', 'Stok produk tidak cukup !!!');
+            return redirect()->to(base_url('produk/detail').'/'.$id);
+        }
+        $keranjang = $this->keranjang->where('produk', $id)->first();
+        if ($keranjang){
+            session()->setFlashdata('error', 'Produk ini sudah ada di keranjang !!!');
+            return redirect()->to(base_url("produk/detail/$id"));
         }
         $this->keranjang->save([
             'buyer' => user()->id,
@@ -57,6 +69,15 @@ class order extends BaseController
         if ($produk['owner'] == user()->id) {
             session()->setFlashdata('error', 'Dilarang membeli produk sendiri !!!');
             return redirect()->to(base_url());
+        }
+        if ($produk['stok'] < 1){
+            session()->setFlashdata('error', 'Stok produk tidak cukup !!!');
+            return redirect()->to(base_url());
+        }
+        $keranjang = $this->keranjang->where('produk', $idp)->first();
+        if ($keranjang){
+            session()->setFlashdata('error', 'Produk ini sudah ada di keranjang !!!');
+            return redirect()->to(base_url("produk/detail/$idp"));
         }
         $this->keranjang->save([
             'buyer' => user()->id,
@@ -84,6 +105,12 @@ class order extends BaseController
             session()->setFlashdata('error', 'Produk tidak ditemukan');
             return redirect()->to(base_url());
         }
+        $keranjang = $this->keranjang->where('id', $idk)->first();
+        $produk = $this->produk->where('id', $keranjang['produk'])->first();
+        if ($produk['stok'] < $jumlah){
+            session()->setFlashdata('error', 'Stok produk tidak cukup !!!');
+            return redirect()->to(base_url('user/order/keranjang'));
+        }
         $this->keranjang->update(
             $keranjangid,
             [
@@ -110,6 +137,7 @@ class order extends BaseController
         $keranjang->select('produk.nama as nama_produk');
         $keranjang->select('produk.harga as harga_produk');
         $keranjang->select('produk.gambar as gambar_produk');
+        $keranjang->select('produk.stok as stok_produk');
         $keranjang->where('buyer', user()->id);
         $hasilkeranjang = $keranjang->where('keranjang.status', 1);
         $keranjang = $hasilkeranjang->findAll();
@@ -117,6 +145,11 @@ class order extends BaseController
         $harga = array_column($keranjang, 'harga_produk');
         $hp = [];
         foreach ($keranjang as $k) {
+            if ($k['jumlah'] > $k['stok_produk'] && $k['status'] == 1){
+                $this->keranjang->delete($k['id']);
+                $this->keranjang->purgeDeleted($k['id']);
+                return redirect()->to(base_url('user/order/keranjang'));
+            }
             array_push($hp, $k['harga_produk'] * $k['jumlah']);
         }
         $totalharga = array_sum($hp);

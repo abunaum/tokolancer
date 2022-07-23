@@ -19,6 +19,7 @@
             </div>
             <div class="col-md-8 mb-3" style="background-color: #dce0e0;">
                 <center class="mt-3">
+                    <h5><?= $produk->jenis; ?></h5>
                     <h5><?= $produk->nama; ?></h5>
                     <p class="text-muted text-uppercase small">
                         <i>Stok : <?= $produk->stok; ?></i>
@@ -50,12 +51,18 @@
                         <?php else : ?>
                             <?php if ($produk->status_toko != 1) : ?>
                                 <span>
-                                    <strong>Toko sedang tutup</strong>
+                                    <strong>Toko Sedang Tutup</strong>
                                 </span>
                             <?php else : ?>
-                                <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                                        data-bs-target="#orderModal">Beli
-                                </button>
+                                <?php if ($produk->stok < 1) : ?>
+                                    <span>
+                                    <strong>Stok Produk Habis</strong>
+                                </span>
+                                <?php else: ?>
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#orderModal">Beli
+                                    </button>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -73,8 +80,14 @@
                 <div class="products">
                     <?php foreach ($produktoko as $pu) : ?>
                         <div class="product">
-                            <a class="woocommerce-LoopProduct-link woocommerce-loop-product__link" href="<?= base_url('/user/toko/produk/detail') . '/' . $pu['id']; ?>">
+                            <a class="woocommerce-LoopProduct-link woocommerce-loop-product__link" href="<?= base_url('produk/detail') . '/' . $pu['id']; ?>">
                                 <img style="height: 150px; width: 150px;" class="img-thumbnail" src="<?= base_url(); ?>/img/produk/<?= $pu['gambar']; ?>" alt="Gambar">
+                                <span class="price">
+                                        <span class="woocommerce-Price-amount amount">
+                                            <a class="woocommerce-Price-currencySymbol" href="<?= base_url('jenis').'/'.$pu['id_jenis'];?>">
+                                                <?=$pu['jenis']; ?>
+                                            </a>
+                                    </span>
                                 <span class="price">
                                     <span class="woocommerce-Price-amount amount">
                                         <span class="woocommerce-Price-currencySymbol">Rp </span><?= number_format($pu['harga']); ?></span>

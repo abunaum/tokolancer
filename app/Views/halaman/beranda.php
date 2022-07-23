@@ -13,6 +13,12 @@
                                     <img style="height: 150px; width: 150px;" class="img-thumbnail" src="<?= base_url(); ?>/img/produk/<?= $p['gambar']; ?>" alt="Gambar">
                                     <span class="price">
                                         <span class="woocommerce-Price-amount amount">
+                                            <a class="woocommerce-Price-currencySymbol" href="<?= base_url('jenis').'/'.$p['id_jenis'];?>">
+                                                <?=$p['jenis']; ?>
+                                            </a>
+                                    </span>
+                                    <span class="price">
+                                        <span class="woocommerce-Price-amount amount">
                                             <span class="woocommerce-Price-currencySymbol">Rp </span><?= number_format($p['harga']); ?></span>
                                     </span>
                                     <!-- .price -->

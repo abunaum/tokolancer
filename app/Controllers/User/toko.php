@@ -78,7 +78,14 @@ class toko extends BaseController
             'item' => 'required',
             'sub' => 'required',
             'nama' => 'required',
-            'harga' => 'required',
+            'harga' => [
+                'rules' => 'required|is_natural_no_zero|greater_than_equal_to[10000]',
+                'errors' => [
+                    'required' => 'Nominal harus ada',
+                    'is_natural_no_zero' => 'Nominal tidak valid',
+                    'greater_than_equal_to' => 'Minimal harga 10000',
+                ]
+            ],
             'deskripsi' => 'required',
             'stok' => 'required',
             'gambar' => [

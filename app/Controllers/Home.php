@@ -15,14 +15,16 @@ class Home extends BaseController
         $cari = $this->request->getVar('search');
         $produk = $this->produk;
         $produk->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $produk->join('sub_item', 'sub_item.id = produk.jenis', 'LEFT');
         $produk->join('users', 'users.id = produk.owner', 'LEFT');
         $produk->select('produk.*');
+        $produk->select('sub_item.id as id_jenis');
+        $produk->select('sub_item.nama as jenis');
         $produk->select('toko.username');
         $produk->select('users.status_toko');
         $produk->select('toko.status');
         $produk->where('status_toko', 4);
         $produk->where('stok >=', 1);
-
         $item = getsub();
         if ($cari) {
             $produk = $this->produk->search($cari);
@@ -42,12 +44,14 @@ class Home extends BaseController
         $cari = $this->request->getVar('search');
         $produk = $this->produk;
         $produk->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $produk->join('sub_item', 'sub_item.id = produk.jenis', 'LEFT');
         $produk->join('users', 'users.id = produk.owner', 'LEFT');
         $produk->select('produk.*');
+        $produk->select('sub_item.id as id_jenis');
+        $produk->select('sub_item.nama as jenis');
         $produk->select('toko.username');
         $produk->select('users.status_toko');
         $produk->select('toko.status');
-        $produk->where('produk.jenis', $id);
         $produk->where('status_toko', 4);
         $produk->where('stok >=', 1);
         $item = getsub();
@@ -68,19 +72,25 @@ class Home extends BaseController
     {
         $produk = $this->produk;
         $produk->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $produk->join('sub_item', 'sub_item.id = produk.jenis', 'LEFT');
         $produk->select('produk.*');
         $produk->select('toko.status as status_toko');
         $produk->select('toko.username as username_toko');
+        $produk->select('sub_item.id as id_jenis');
+        $produk->select('sub_item.nama as jenis');
         $produk = $produk->where('produk.id', $id)->first();
         $item = $this->getitem->getsub();
         $produktoko = $this->produk;
         $produktoko->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $produktoko->join('sub_item', 'sub_item.id = produk.jenis', 'LEFT');
         $produktoko->where('owner', $produk['owner']);
         $produktoko->select('produk.*');
         $produktoko->select('toko.status as status_toko');
         $produktoko->select('toko.username as username_toko');
+        $produktoko->select('sub_item.id as id_jenis');
+        $produktoko->select('sub_item.nama as jenis');
         $produktoko->where('owner', $produk['owner']);
-        $produktoko->where('status', 1);
+        $produktoko->where('toko.status', 1);
         $data = [
             'judul' => "Produk | $this->namaweb",
             'item' => $item,

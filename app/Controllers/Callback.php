@@ -74,18 +74,43 @@ class Callback extends BaseController
             $keranjang = $keranjang->findAll();
 //        return $this->respond($keranjang, 200);
             foreach ($keranjang as $k) {
-                $kid = $k['id'];
-                $this->keranjang->update(
-                    $kid,
-                    [
-                        'status' => 3,
-                    ]
-                );
-                $pesan = 'Produk anda "' . $k['nama'] . '" telah dipesan dengan jumlah x' . $k['jumlah'] . ', yuk cek di ' . base_url('user/toko/transaksi');
-                if ($k['telecode'] == 'valid') {
-                    kirimpesan($k['teleid'], $pesan);
+                $produk = $this->produk->where('id', $k['id'])->first();
+                $stok = $produk['stok'];
+                if ($stok >= 1) {
+                    $kid = $k['id'];
+                    $jumlah = $k['jumlah'];
+                    $this->keranjang->update(
+                        $kid,
+                        [
+                            'status' => 3,
+                        ]
+                    );
+                    $this->produk->update(
+                        $produk['id'],
+                        [
+                            'stok' => $stok - $jumlah
+                        ]
+                    );
+                    $pesan = 'Produk anda "' . $k['nama'] . '" telah dipesan dengan jumlah x' . $k['jumlah'] . ', \n stok produk anda sisa ' . ($stok - 1) . ' \n yuk cek di ' . base_url('user/toko/transaksi');
+                    if ($k['telecode'] == 'valid') {
+                        kirimpesan($k['teleid'], $pesan);
+                    }
                 }
-
+                else {
+                    $buyer = $this->users->where('id',$k['buyer'])->first();
+                    $pesan = 'Produk yang anda beli "' . $k['nama'] . '" telah habis' . ', \n Tapi jangan hawatir, dana anda telah dikembalikan ke saldo';
+                    $kid = $k['id'];
+                    $this->keranjang->update(
+                        $kid,
+                        [
+                            'pesan' => 'Dana dikembalikan ke saldo anda',
+                            'status' => 4
+                        ]
+                    );
+                    if ($buyer['telecode'] == 'valid') {
+                        kirimpesan($buyer['teleid'], $pesan);
+                    }
+                }
             }
         }
         return $this->respond($res, 200);
