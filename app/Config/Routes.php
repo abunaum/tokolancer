@@ -79,6 +79,11 @@ $routes->group('admin',["filter" => "auth"], function ($routes) {
         $routes->post('tolak/(:num)', 'Admin\Toko::pengajuantolak/$1');
         $routes->post('acc/(:num)', 'Admin\Toko::pengajuanacc/$1');
     });
+    $routes->group('pencairan', function ($routes) {
+        $routes->get('seller', 'Admin\Toko::pencairan_seller');
+        $routes->post('acc/(:num)', 'Admin\Toko::pencairanacc/$1');
+        $routes->post('tolak/(:num)', 'Admin\Toko::pencairantolak/$1');
+    });
 });
 $routes->group('toko', ['filter' => 'auth'], function ($routes) {
     $routes->get('', 'Toko\Fitur::index');
@@ -117,6 +122,7 @@ $routes->group('user', ['filter' => 'auth'], function ($routes) {
         $routes->post('kirim/(:num)', 'User\toko::kirimproduk/$1');
         $routes->get('saldo', 'User\toko::saldo');
         $routes->post('cairkan', 'User\toko::cairkan');
+        $routes->get('riwayat_pencairan', 'User\toko::riwayat_pencairan');
     });
     $routes->group('order', function ($routes) {
         $routes->post('produk/(:num)', 'User\order::produk/$1');

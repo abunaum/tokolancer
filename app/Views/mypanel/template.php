@@ -14,7 +14,7 @@
 
     <!-- Fontfaces CSS-->
     <link href="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/css/font-face.css" rel="stylesheet" media="all">
-    <link href="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/vendor/font-awesome-5.15/css/all.css" rel="stylesheet" media="all">
+    <script src="https://kit.fontawesome.com/1ef64ee6ba.js" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
 
     <!-- Bootstrap CSS-->

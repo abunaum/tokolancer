@@ -118,7 +118,7 @@ class Admin extends BaseController
             'judul' => "Admin SubItem | $this->namaweb",
             'itemlist' => $item->findAll(),
             'validation' => \Config\Services::validation(),
-            'subitem' => $subitem->paginate(10),
+            'subitem' => $subitem->paginate(10,'subitem'),
             'pager' => $subitem->pager
         ];
         // dd($item);

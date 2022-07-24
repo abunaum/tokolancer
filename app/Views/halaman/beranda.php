@@ -26,7 +26,7 @@
                                     <h2 class="woocommerce-loop-product__title"><i>@<?= $p['username']; ?></i></h2>
                                 </a>
                                 <!-- .woocommerce-LoopProduct-link -->
-                                <div class="hover-area flex-row justify-content-center">
+                                <div class="flex-row justify-content-center">
                                     <a class="button" href="<?= base_url('produk/detail') . '/' . $p['id'] ?>">Detail</a>
                                     <?php if ($p['status'] == 1) : ?>
                                         <?php if (cek_login() == true) : ?>
@@ -40,7 +40,7 @@
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <?= $pager->links(); ?>
+                    <?= $pager->links('produk','halaman'); ?>
                     <!-- .products -->
                 </div>
                 <!-- .woocommerce -->

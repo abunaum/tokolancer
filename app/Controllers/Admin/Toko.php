@@ -24,7 +24,6 @@ class Toko extends BaseController
         $user->select('users.*');
         $user->select('toko.username as usernametoko');
         $user->select('toko.id as idtoko');
-//        dd($user->findAll());
         $data = [
             'namaweb' => $this->namaweb,
             'judul' => "Admin Toko | $this->namaweb",
@@ -96,7 +95,6 @@ class Toko extends BaseController
             $chatId = $user->teleid;
             $pesan = $user->fullname . '\nMantap, Toko anda telah di aktivasi, sekarang anda bisa berjualan di ' . base_url();
             kirimpesan($chatId, $pesan);
-            session()->setFlashdata('pesan', 'Toko berhasil ACC');
         }
         $usergass = new $this->users;
         $usergass->save([
@@ -107,8 +105,108 @@ class Toko extends BaseController
             'id' => $toko->id,
             'status' => 1
         ]);
+        session()->setFlashdata('pesan', 'Toko berhasil ACC');
         return redirect()->to(base_url('admin/toko/pengajuan'));
     }
-    //--------------------------------------------------------------------
+
+    public function pencairan_seller()
+    {
+        $pencairan = $this->transaksi_saldo;
+        $pencairan->join('users', 'users.id = user', 'LEFT');
+        $pencairan->join('toko', 'toko.userid = users.id', 'LEFT');
+        $pencairan->select('transaksi_saldo.*');
+        $pencairan->select('users.email');
+        $pencairan->select('users.teleid');
+        $pencairan->select('users.telecode');
+        $pencairan->select('toko.metode');
+        $pencairan->select('toko.nama_rek');
+        $pencairan->select('toko.no_rek');
+        $pencairan->where('transaksi_saldo.status', 1);
+        $data = [
+            'namaweb' => $this->namaweb,
+            'judul' => "Pencairan Seller | $this->namaweb",
+            'pencairan' => $pencairan->paginate(10),
+            'pager' => $pencairan->pager,
+        ];
+        return view('admin/pencairan_seller', $data);
+    }
+
+    public function pencairanacc($id = 0 )
+    {
+        $pencairan = $this->transaksi_saldo;
+        $pencairan->join('users', 'users.id = user', 'LEFT');
+        $pencairan->join('toko', 'toko.userid = users.id', 'LEFT');
+        $pencairan->select('transaksi_saldo.*');
+        $pencairan->select('users.email');
+        $pencairan->select('users.teleid');
+        $pencairan->select('users.telecode');
+        $pencairan->select('toko.metode');
+        $pencairan->select('toko.nama_rek');
+        $pencairan->select('toko.no_rek');
+        $pencairan->where('transaksi_saldo.id', $id);
+        $pencairan->where('transaksi_saldo.status', 1);
+        $pencairan = $pencairan->first();
+        $info = $this->request->getVar('info');
+        $nominal = $pencairan['nominal'];
+
+        $getuser = $this->users->where('id', $pencairan['user'])->first();
+        $this->transaksi_saldo->update(
+            $id,
+            [
+                'status' => 2,
+                'keterangan' => $info
+            ]
+        );
+        if ($getuser['telecode'] == 'valid') {
+            $chatId = $getuser['teleid'];
+            $pesan = 'Mantap!, Pencairan saldo anda sudah dicairkan.\n'.number_to_currency($nominal, 'IDR', 'id_ID',0).' telah dikirimkan ke rekening anda. \n'.$info;
+            kirimpesan($chatId, $pesan);
+        }
+        session()->setFlashdata('pesan', 'Pencairan berhasil di ACC');
+        return redirect()->to(base_url('admin/pencairan/seller'));
+    }
+
+    public function pencairantolak($id = 0 )
+    {
+        $pencairan = $this->transaksi_saldo;
+        $pencairan->join('users', 'users.id = user', 'LEFT');
+        $pencairan->join('toko', 'toko.userid = users.id', 'LEFT');
+        $pencairan->select('transaksi_saldo.*');
+        $pencairan->select('users.email');
+        $pencairan->select('users.teleid');
+        $pencairan->select('users.telecode');
+        $pencairan->select('toko.metode');
+        $pencairan->select('toko.nama_rek');
+        $pencairan->select('toko.no_rek');
+        $pencairan->where('transaksi_saldo.id', $id);
+        $pencairan->where('transaksi_saldo.status', 1);
+        $pencairan = $pencairan->first();
+        $info = $this->request->getVar('info');
+        $tambahansaldo = $pencairan['fee'] + $pencairan['nominal'];
+
+        $getuser = $this->users->where('id', $pencairan['user'])->first();
+        $saldobaru = $getuser['balance'] + $tambahansaldo;
+        $this->users->update(
+            $pencairan['user'],
+            [
+                'balance' => $saldobaru
+            ]
+        );
+
+        $this->transaksi_saldo->update(
+            $id,
+            [
+                'status' => 3,
+                'keterangan' => 'Dana dikembalikan, '.$info
+            ]
+        );
+        if ($getuser['telecode'] == 'valid') {
+            $chatId = $getuser['teleid'];
+            $pesan = 'Ooops!, Pencairan saldo anda di tolak karena '.$info.'.\n'.number_to_currency($tambahansaldo, 'IDR', 'id_ID',0).' telah dikembalikan ke saldo anda. \nSaldo anda sekarang '.number_to_currency($saldobaru, 'IDR', 'id_ID',0);
+            kirimpesan($chatId, $pesan);
+        }
+        session()->setFlashdata('pesan', 'Pencairan berhasil di Tolak');
+        return redirect()->to(base_url('admin/pencairan/seller'));
+    }
 
 }

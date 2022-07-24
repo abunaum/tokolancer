@@ -384,11 +384,16 @@ class toko extends BaseController
         $toko = $this->toko;
         $toko->where('userid', user()->id);
         $toko= $toko->first();
+        $pencairan = $this->transaksi_saldo;
+        $pencairan->where('user', user()->id);
+        $pencairan->where('status', 1);
+        $pencairan = $pencairan->findAll();
         $data = [
             'judul' => "Saldo toko | $this->namaweb",
             'item' => $item,
             'toko' => $toko,
             'cair' => $config['cair'],
+            'pencairan' => $pencairan,
             'validation' => \Config\Services::validation()
         ];
         return view('halaman/user/saldotoko', $data);
@@ -396,6 +401,7 @@ class toko extends BaseController
     public function cairkan()
     {
         $config = ambilconfig();
+        $cair = $config['cair'];
         $nominal = $this->request->getVar('nominal');
 
         if (!$this->validate([
@@ -411,18 +417,66 @@ class toko extends BaseController
             session()->setFlashdata('error', 'Gagal request pencairan dana');
             return redirect()->to(base_url('user/toko/saldo'))->withInput();
         }
-        $bisadicairkan = user()->balance - $config['cair']['fee'];
+        $bisadicairkan = user()->balance - $cair['fee'];
         if ($nominal > $bisadicairkan){
             session()->setFlashdata('error', 'Nominal tidak valid');
             return redirect()->to(base_url('user/toko/saldo'));
-        } elseif ($nominal < $config['cair']['minimal']){
+        } elseif ($nominal < $cair['minimal']){
             session()->setFlashdata('error', 'Nominal tidak valid');
             return redirect()->to(base_url('user/toko/saldo'));
-        } elseif ($bisadicairkan < $config['cair']['minimal']){
+        } elseif ($bisadicairkan < $cair['minimal']){
             session()->setFlashdata('error', 'Nominal tidak valid');
             return redirect()->to(base_url('user/toko/saldo'));
         } else {
             $transaksi = $this->transaksi_saldo;
+            $transaksi->save(
+                [
+                    'user' => user()->id,
+                    'nominal' => $nominal,
+                    'fee'=> $cair['fee'],
+                    'status' => 1,
+                    'keterangan' => 'Pencairan sedang di proses'
+                ]
+            );
+            $newbalance = user()->balance - ($nominal + $cair['fee']);
+            $this->users->update(
+                user()->id,
+                [
+                    'balance'=>$newbalance
+                ]
+            );
+            if (user()->telecode == 'valid'){
+                $pesanuser = 'Pencairan dana '. number_to_currency($nominal, 'IDR', 'id_ID', 0).' sedang di proses, saldo anda sekarang '. number_to_currency(user()->balance, 'IDR', 'id_ID', 0);
+                kirimpesan(user()->teleid, $pesanuser);
+            }
+            $toko = $this->toko->where('userid', user()->id)->first();
+            $admin = getadmin();
+            foreach ($admin as $admn) {
+                $id_admin = $admn['iduser'];
+                $min = $this->users->where('id', $id_admin)->get()->getFirstRow();
+                if($min->telecode == 'valid'){
+                    $chatId = $min->teleid;
+                    $pesan = user()->email . '\n Melakukan request pencairan saldo : \nNominal : ' . number_to_currency($nominal, 'IDR', 'id_ID', 0) . '\nMetode : ' . $toko['metode'] . '\nNo Rekening : ' . $toko['no_rek'].'\nAtas Nama : '.$toko['nama_rek'];
+                    kirimpesan($chatId, $pesan);
+                }
+            }
+            session()->setFlashdata('pesan', 'Berhasil mengajukan pencairan dana');
+            return redirect()->to(base_url('user/toko/saldo'));
         }
+    }
+
+    public function riwayat_pencairan()
+    {
+        $item = $this->getitem->getsub();
+        $pencairan = $this->transaksi_saldo;
+        $pencairan->where('user', user()->id);
+        $pencairan->where('status !=', 1);
+        $pencairan = $pencairan->orderBy('created_at','DESC')->findAll();
+        $data = [
+            'judul' => "Riwayat pencairan | $this->namaweb",
+            'item' => $item,
+            'pencairan' => $pencairan
+        ];
+        return view('halaman/user/riwayat_pencairan', $data);
     }
 }

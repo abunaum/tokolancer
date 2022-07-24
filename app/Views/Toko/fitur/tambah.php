@@ -104,14 +104,6 @@
                     </form>
                 </div>
             </div>
-            <div class="mt-3">
-                <center>
-                    <h1>Punya Produk Baru ?</h1>
-                    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#baruModal">
-                        Ajukan Produk Baru Sekarang
-                    </button>
-                </center>
-            </div>
         </div>
     </div>
     <!-- .col-full -->

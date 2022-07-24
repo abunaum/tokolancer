@@ -20,7 +20,7 @@ class User extends BaseController
         $data = [
             'namaweb' => $this->namaweb,
             'judul' => "Admin User | $this->namaweb",
-            'user' => $this->users->where('id !=', user()->id)->paginate(10),
+            'user' => $this->users->where('id !=', user()->id)->paginate(10,'user'),
             'pager' => $this->users->where('id !=', user()->id)->pager,
         ];
         return view('admin/user', $data);

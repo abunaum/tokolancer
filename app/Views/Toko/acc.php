@@ -43,7 +43,7 @@
         <div class="col-sm-2 mb-2">
             <div class="card">
                 <div class="card-body">
-                    <a href="<?= base_url('user/toko/riwayat') ?>">
+                    <a href="<?= base_url('user/toko/riwayat_pencairan') ?>">
                         <span class="iconify" data-icon="ic:twotone-history" data-inline="false" style="color: green;" data-width="80" data-height="80"></span>
                         <p class="card-text">Riwayat pencairan</p>
                     </a>

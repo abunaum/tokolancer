@@ -61,7 +61,9 @@
                         </tbody>
                     </table>
                 </div>
-                <?= $pager->links(); ?>
+                <div class="mt-3 mb-3">
+                    <?= $pager->links('user','halaman'); ?>
+                </div>
             </center>
         </div>
     </div>

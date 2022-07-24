@@ -97,7 +97,7 @@
                                 <h2 class="woocommerce-loop-product__title"><i>@<?= $pu['username_toko']; ?></i></h2>
                             </a>
 
-                            <div class="hover-area">
+                            <div>
                                 <a class="button" href="<?= base_url('produk/detail') . '/' . $pu['id']; ?>">Detail</a>
                             </div>
 

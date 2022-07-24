@@ -32,7 +32,7 @@ class Home extends BaseController
         $data = [
             'judul' => "Beranda | $this->namaweb",
             'item' => $item,
-            'produk' => $produk->paginate(4),
+            'produk' => $produk->paginate(4,'halaman'),
             'pager' => $produk->pager,
         ];
 
@@ -61,7 +61,7 @@ class Home extends BaseController
         $data = [
             'judul' => "Beranda | $this->namaweb",
             'item' => $item,
-            'produk' => $produk->paginate(4),
+            'produk' => $produk->paginate(4,'halaman'),
             'pager' => $produk->pager,
         ];
 

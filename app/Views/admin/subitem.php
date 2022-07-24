@@ -68,8 +68,10 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <div class="mb-3 mt-3">
+                        <?= $pager->links('subitem','halaman'); ?>
+                    </div>
                 </div>
-                <?= $pager->links(); ?>
             </center>
         </div>
     </div>
