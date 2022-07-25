@@ -119,7 +119,7 @@ class Fitur extends BaseController
 
             if ($adm->telecode == 'valid') {
                 $chatId = $adm->teleid;
-                $pesan = 'username : ' . user()->username . '\n Toko : ' . $tokodb->username . '\n mengajukan aktivasi toko';
+                $pesan = 'username : ' . user()->email . '\n Toko : ' . $tokodb->username . '\n mengajukan aktivasi toko';
                 kirimpesan($chatId, $pesan);
             }
         }

@@ -79,6 +79,17 @@ class Home extends BaseController
         $produk->select('sub_item.id as id_jenis');
         $produk->select('sub_item.nama as jenis');
         $produk = $produk->where('produk.id', $id)->first();
+        if (!$produk){
+            session()->setFlashdata('error', 'Produk tidak ditemukan');
+            return redirect()->to(base_url());
+        }
+
+        $terjual = $this->keranjang;
+        $terjual->where('produk', $id);
+        $terjual->where('status', 6);
+        $terjual = $terjual->findAll();
+        $terjual = count($terjual);
+
         $item = $this->getitem->getsub();
         $produktoko = $this->produk;
         $produktoko->join('toko', 'toko.userid = produk.owner', 'LEFT');
@@ -96,6 +107,7 @@ class Home extends BaseController
             'item' => $item,
             'validation' => \Config\Services::validation(),
             'produk' => (object)$produk,
+            'terjual' => $terjual,
             'produktoko' => $produktoko->paginate(6),
             'pager' => $produktoko->pager,
         ];

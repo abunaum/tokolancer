@@ -158,10 +158,15 @@ class toko extends BaseController
         }
     }
 
-    public function hapusproduk($id)
+    public function hapusproduk($id = 0)
     {
         $produk = $this->produk->where('id', $id)->get()->getFirstRow();
+        if (!$produk){
+            session()->setFlashdata('error', 'Produk tidak ditemukan');
+            return redirect()->to(base_url('toko'));
+        }
         if ($produk->owner != user()->id) {
+            session()->setFlashdata('error', 'Produk tidak ditemukan');
             return redirect()->to(base_url('toko'));
         } else {
             $this->produk->delete($id);
@@ -184,7 +189,14 @@ class toko extends BaseController
         if (!$this->validate([
             'nama' => 'required|alpha_numeric_punct|min_length[3]',
             'keterangan' => 'required',
-            'harga' => 'required|is_natural|min_length[1]',
+            'harga' => [
+                'rules' => 'required|is_natural_no_zero|greater_than_equal_to[10000]',
+                'errors' => [
+                    'required' => 'Nominal harus ada',
+                    'is_natural_no_zero' => 'Nominal tidak valid',
+                    'greater_than_equal_to' => 'Minimal harga 10000',
+                ]
+            ],
             'stok' => 'required|is_natural|min_length[1]',
             'gambar' => [
                 'rules' => 'max_size[gambar,1024]|is_image[gambar]|mime_in[gambar,image/jpg,image/jpeg,image/png]',

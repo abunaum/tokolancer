@@ -21,19 +21,15 @@
                 <center class="mt-3">
                     <h5><?= $produk->jenis; ?></h5>
                     <h5><?= $produk->nama; ?></h5>
-                    <p class="text-muted text-uppercase small">
+                    <p class="text-muted">
                         <i>Stok : <?= $produk->stok; ?></i>
                     </p>
-                    <p class="text-muted text-uppercase small">
+                    <p class="text-muted small">
                         Store : <i>@<?= $produk->username_toko; ?></i>
                     </p>
-                    <div>
-                        <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
-                        <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
-                        <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
-                        <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
-                        <span class="iconify" data-icon="emojione:star" data-inline="false"></span>
-                    </div>
+                    <p class="small">
+                        Terjual : <i><?= $terjual; ?></i>
+                    </p>
                     <p>
                         <span>
                             <strong>Rp. <?= number_format($produk->harga); ?></strong>

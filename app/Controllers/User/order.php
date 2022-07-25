@@ -423,7 +423,6 @@ class order extends BaseController
 
     public function detailtransaksi($id = 0)
     {
-//        dd($id);
         $item = $this->getitem->getsub();
         $keranjang = $this->keranjang;
         $keranjang->join('produk', 'produk.id = keranjang.produk', 'LEFT');

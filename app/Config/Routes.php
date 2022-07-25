@@ -78,11 +78,22 @@ $routes->group('admin',["filter" => "auth"], function ($routes) {
         $routes->post('detail/(:num)', 'Admin\Toko::pengajuandetail/$1');
         $routes->post('tolak/(:num)', 'Admin\Toko::pengajuantolak/$1');
         $routes->post('acc/(:num)', 'Admin\Toko::pengajuanacc/$1');
+        $routes->get('toko', 'Admin\Toko::listtoko');
+        $routes->post('banned/(:num)', 'Admin\Toko::banned/$1');
+        $routes->post('unbanned/(:num)', 'Admin\Toko::unbanned/$1');
+        $routes->get('produk', 'Admin\Toko::listproduk');
+        $routes->delete('hapusproduk/(:num)', 'Admin\Toko::hapusproduk/$1');
     });
     $routes->group('pencairan', function ($routes) {
         $routes->get('seller', 'Admin\Toko::pencairan_seller');
         $routes->post('acc/(:num)', 'Admin\Toko::pencairanacc/$1');
         $routes->post('tolak/(:num)', 'Admin\Toko::pencairantolak/$1');
+        $routes->get('riwayat', 'Admin\Toko::riwayat');
+    });
+    $routes->group('transaksi', function ($routes) {
+        $routes->get('berlangsung', 'Admin\Transaksi::berlangsung');
+        $routes->get('selesai', 'Admin\Transaksi::selesai');
+        $routes->get('bermasalah', 'Admin\Transaksi::bermasalah');
     });
 });
 $routes->group('toko', ['filter' => 'auth'], function ($routes) {

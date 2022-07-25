@@ -209,4 +209,117 @@ class Toko extends BaseController
         return redirect()->to(base_url('admin/pencairan/seller'));
     }
 
+    public function listtoko()
+    {
+        $toko = $this->toko->findAll();
+        $tokowp = [];
+        foreach ($toko as $t){
+            $produk = $this->produk->where('owner', $t['userid'])->findAll();
+            $user = $this->users->where('id', $t['userid'])->first();
+            $tokowp[] = [
+                'toko' => $t,
+                'user' => $user,
+                'produk' => $produk,
+            ];
+        }
+        $data = [
+            'namaweb' => $this->namaweb,
+            'judul' => "List Toko | $this->namaweb",
+            'toko' => $tokowp,
+        ];
+        return view('admin/list_toko', $data);
+    }
+
+    public function banned($id=0)
+    {
+        $toko = $this->toko->where('id', $id)->first();
+        if (!$toko){
+            session()->setFlashdata('error', 'Toko tidak ditemukan');
+            return redirect()->to(base_url('admin/toko/toko'));
+        }
+        $user = $this->users->where('id', $toko['userid'])->first();
+        $this->users->update(
+            $user['id'],
+            [
+                'status_toko' => 5
+            ]
+        );
+        $this->toko->update(
+            $id,
+            [
+                'status' => 0
+            ]
+        );
+        if ($user['telecode'] == 'valid') {
+            $chatId = $user['teleid'];
+            $pesan = 'Ooops!, Toko anda di banned oleh admin. \nSilahkan hubungi CS untuk melepas banned';
+            kirimpesan($chatId, $pesan);
+        }
+        session()->setFlashdata('pesan', 'Toko berhasil di banned');
+        return redirect()->to(base_url('admin/toko/toko'));
+    }
+
+    public function unbanned($id=0)
+    {
+        $toko = $this->toko->where('id', $id)->first();
+        if (!$toko){
+            session()->setFlashdata('error', 'Toko tidak ditemukan');
+            return redirect()->to(base_url('admin/toko/toko'));
+        }
+        $user = $this->users->where('id', $toko['userid'])->first();
+        $this->users->update(
+            $user['id'],
+            [
+                'status_toko' => 4
+            ]
+        );
+        if ($user['telecode'] == 'valid') {
+            $chatId = $user['teleid'];
+            $pesan = 'Mantap!, Toko anda sudah di Unbanned oleh admin. \nSekarang anda bisa berjualan lagi di '. base_url();
+            kirimpesan($chatId, $pesan);
+        }
+        session()->setFlashdata('pesan', 'Toko berhasil di lepas');
+        return redirect()->to(base_url('admin/toko/toko'));
+    }
+
+    public function listproduk()
+    {
+        $produk = $this->produk;
+        $produk->join('toko', 'toko.userid = produk.owner', 'LEFT');
+        $produk->join('sub_item', 'sub_item.id = produk.jenis', 'LEFT');
+        $produk->join('item', 'item.id = sub_item.item', 'LEFT');
+        $produk->select('produk.id');
+        $produk->select('produk.nama');
+        $produk->select('produk.harga');
+        $produk->select('toko.username');
+        $produk->select('sub_item.nama as nama_subitem');
+        $produk->select('item.nama as nama_item');
+        $produk = $produk->orderBy('produk.nama', 'ASC')->findAll();
+        $data = [
+            'namaweb' => $this->namaweb,
+            'judul' => "List Produk | $this->namaweb",
+            'produk' => $produk,
+        ];
+        return view('admin/list_produk', $data);
+    }
+
+    public function hapusproduk($id = 0)
+    {
+        $produk = $this->produk->where('id', $id)->first();
+        if (!$produk){
+            session()->setFlashdata('error', 'Toko tidak ditemukan');
+            return redirect()->to(base_url('admin/toko/produk'));
+        }
+        $user = $this->users->where('id', $produk['owner'])->first();
+        if ($user['telecode'] == 'valid') {
+            $chatId = $user['teleid'];
+            $pesan = 'Ooops!, Produk "'. $produk['nama'] .'". Telah dihapus oleh admin karena melanggar aturan.';
+            kirimpesan($chatId, $pesan);
+        }
+        $this->produk->delete($id);
+        session()->setFlashdata('pesan', 'Produk Berhasil di hapus');
+        return redirect()->to(base_url('admin/toko/produk'));
+    }
+
+
 }

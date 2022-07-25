@@ -33,6 +33,7 @@
     <link href="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/css/theme.css" rel="stylesheet" media="all">
     <link rel="shortcut icon" href="<?= base_url('tokolancer.ico'); ?>">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/js/swal2/sweetalert2.min.css">
+    <?= $this->renderSection('head'); ?>
 
 </head>
 
@@ -84,7 +85,7 @@
     </div>
 
     <!-- Jquery JS-->
-    <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/vendor/jquery-3.2.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <!-- Bootstrap JS-->
     <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/vendor/bootstrap-4.1/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/mypanel/vendor/bootstrap-4.1/bootstrap.min.js"></script>
@@ -110,6 +111,7 @@
     <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/js/swal2/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/js/swal2/swall.js"></script>
     <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+    <?= $this->renderSection('script'); ?>
 
 </body>
 
