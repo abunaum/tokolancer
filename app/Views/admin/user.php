@@ -15,8 +15,9 @@
                             <td>Username</td>
                             <td>Toko</td>
                             <td>Saldo</td>
+                            <td>Status</td>
                             <td>
-                                <center>Detail</center>
+                                Aksi
                             </td>
                         </thead>
                         <tbody>
@@ -35,26 +36,23 @@
                                         ?>
                                     </td>
                                     <td>Rp.<?= number_format($user['balance']); ?></td>
+                                    <td><?= $user['status'] == 1 ? 'Aktif':'Banned'; ?></td>
                                     <td>
-                                        <div class="row">
-                                            <form class="col-2" action="<?= base_url('admin/user') . '/' . $user['id']; ?>" method="post">
+                                        <?php if ($user['status'] == 1): ?>
+                                            <form action="<?= base_url('admin/user/disable') . '/' . $user['id']; ?>" method="post">
                                                 <?= csrf_field() ?>
-                                                <button type="submit" class="btnhilang">
-                                                    <span class="iconify" data-icon="mdi:card-account-details-outline" data-inline="false" style="color: darkgreen;" data-width="24" data-height="24"></span>
+                                                <button type="button" class="btnhilang ban-usr" data-nama="<?= $user['email']; ?>">
+                                                    <span class="iconify" data-icon="fe:disabled" style="color: red;" data-inline="false" data-width="24" data-height="24"></span>
                                                 </button>
                                             </form>
-                                            <form class="col-2"
-                                                  action="<?= base_url('admin/user') . '/' . $user['id']; ?>"
-                                                  method="post">
+                                        <?php else : ?>
+                                            <form action="<?= base_url('admin/user/enable') . '/' . $user['id']; ?>" method="post">
                                                 <?= csrf_field() ?>
-                                                <button type="button" class="btnhilang tmbl-hps"
-                                                        data-nama="<?= $user['fullname']; ?>">
-                                                    <span class="iconify" data-icon="ic:baseline-delete-forever"
-                                                          data-inline="false" style="color: red;" data-width="24"
-                                                          data-height="24"></span>
+                                                <button type="button" class="btnhilang unban-usr" data-nama="<?= $user['email']; ?>">
+                                                    <span class="iconify" data-icon="icon-park-outline:correct" style="color: green;" data-inline="false" data-width="24" data-height="24"></span>
                                                 </button>
                                             </form>
-                                        </div>
+                                        <?php endif;?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -69,4 +67,43 @@
     </div>
 </div>
 <!-- /.container-fluid -->
+<?= $this->endSection(); ?>
+
+<?= $this->section('script'); ?>
+<script>
+    $(".ban-usr").on('click', function(e) {
+        var nama = $(this).data('nama');
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: 'Mau membanned ' + nama + ' ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Banned',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.form.submit();
+            }
+        })
+    })
+    $(".unban-usr").on('click', function(e) {
+        var nama = $(this).data('nama');
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: 'Mau melepas banned ' + nama + ' ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Lepas',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.form.submit();
+            }
+        })
+    })
+</script>
 <?= $this->endSection(); ?>

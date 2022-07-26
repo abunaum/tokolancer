@@ -15,9 +15,10 @@ class ProdukModel extends Model
 
     public function search($cari)
     {
+        $car = str_replace(' ','-',$cari);
         $produk = $this->table('produk');
         $produk->where('stok >=', 1);
-        $produk->like('slug', $cari);
+        $produk->like('slug', $car);
         return $produk;
     }
 

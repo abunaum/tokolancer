@@ -26,19 +26,38 @@ class User extends BaseController
         return view('admin/user', $data);
     }
 
-    public function detail($id = 0)
+    public function disable($id = 0)
     {
-        $user = new $this->users;
-        $user = $user->where('id', $id);
-        $user = $user->get()->getFirstRow();
-        $data = [
-            'namaweb' => $this->namaweb,
-            'judul' => "Detail User| $this->namaweb",
-            'user' => $user,
-            'validation' => \Config\Services::validation()
-        ];
-        echo $user->fullname;
+        $user = $this->users->where('id',$id)->first();
+        if (!$user){
+            session()->setFlashdata('error', 'User tidak ditemukan');
+            return redirect()->to(base_url('admin/user'));
+        }
+        $this->users->update(
+            $id,
+            [
+                'status' => 0
+            ]
+        );
+        session()->setFlashdata('pesan', 'User berhasil di banned');
+        return redirect()->to(base_url('admin/user'));
     }
-    //--------------------------------------------------------------------
+
+    public function enable($id = 0)
+    {
+        $user = $this->users->where('id',$id)->first();
+        if (!$user){
+            session()->setFlashdata('error', 'User tidak ditemukan');
+            return redirect()->to(base_url('admin/user'));
+        }
+        $this->users->update(
+            $id,
+            [
+                'status' => 1
+            ]
+        );
+        session()->setFlashdata('pesan', 'User berhasil di lepas');
+        return redirect()->to(base_url('admin/user'));
+    }
 
 }

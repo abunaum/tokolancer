@@ -52,6 +52,7 @@ class Home extends BaseController
         $produk->select('toko.username');
         $produk->select('users.status_toko');
         $produk->select('toko.status');
+        $produk->where('sub_item.id', $id);
         $produk->where('status_toko', 4);
         $produk->where('stok >=', 1);
         $item = getsub();

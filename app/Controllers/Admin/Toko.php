@@ -321,5 +321,25 @@ class Toko extends BaseController
         return redirect()->to(base_url('admin/toko/produk'));
     }
 
-
+    public function riwayat_pencairan()
+    {
+        $pencairan = $this->transaksi_saldo;
+        $pencairan->join('users', 'users.id = user', 'LEFT');
+        $pencairan->join('toko', 'toko.userid = users.id', 'LEFT');
+        $pencairan->select('transaksi_saldo.*');
+        $pencairan->select('users.email');
+        $pencairan->select('users.teleid');
+        $pencairan->select('users.telecode');
+        $pencairan->select('toko.metode');
+        $pencairan->select('toko.nama_rek');
+        $pencairan->select('toko.no_rek');
+        $pencairan->where('transaksi_saldo.status !=', 1);
+        $pencairan = $pencairan->findAll();
+        $data = [
+            'namaweb' => $this->namaweb,
+            'judul' => "Pencairan Seller | $this->namaweb",
+            'pencairan' => $pencairan,
+        ];
+        return view('admin/riwayat_pencairan', $data);
+    }
 }

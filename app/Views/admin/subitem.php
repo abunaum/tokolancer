@@ -23,7 +23,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $i = 0; ?>
+                            <?php $i = $start; ?>
                             <?php foreach ($subitem as $sub) : ?>
                                 <?php $i++ ?>
                                 <tr>

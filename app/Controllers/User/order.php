@@ -41,7 +41,11 @@ class order extends BaseController
             session()->setFlashdata('error', 'Stok produk tidak cukup !!!');
             return redirect()->to(base_url('produk/detail').'/'.$id);
         }
-        $keranjang = $this->keranjang->where('produk', $id)->first();
+        $keranjang = $this->keranjang;
+        $keranjang->where('produk', $id);
+        $keranjang->where('buyer', user()->id);
+        $keranjang->where('status', 1);
+        $keranjang = $keranjang->first();
         if ($keranjang){
             session()->setFlashdata('error', 'Produk ini sudah ada di keranjang !!!');
             return redirect()->to(base_url("produk/detail/$id"));
@@ -74,7 +78,11 @@ class order extends BaseController
             session()->setFlashdata('error', 'Stok produk tidak cukup !!!');
             return redirect()->to(base_url());
         }
-        $keranjang = $this->keranjang->where('produk', $idp)->first();
+        $keranjang = $this->keranjang;
+        $keranjang->where('produk', $idp);
+        $keranjang->where('buyer', user()->id);
+        $keranjang->where('status', 1);
+        $keranjang = $keranjang->first();
         if ($keranjang){
             session()->setFlashdata('error', 'Produk ini sudah ada di keranjang !!!');
             return redirect()->to(base_url("produk/detail/$idp"));
@@ -477,14 +485,21 @@ class order extends BaseController
                 'status' => 2
             ]
         );
+        $this->keranjang->update(
+            $id,
+            [
+                'pesan' => 'Pesanan terkirim, Menunggu respon buyer'
+            ]
+        );
         session()->setFlashdata('pesan', 'Transaksi tidak ditemukan');
         return redirect()->to(base_url('user/order/detailtransaksi').'/'.$id);
     }
 
     public function transaksiselesai($id = 0){
         $keranjang = $this->keranjang;
-        $keranjang->where('keranjang.id', $id);
-        $keranjang->where('keranjang.buyer', user()->id);
+        $keranjang->where('id', $id);
+        $keranjang->where('buyer', user()->id);
+        $keranjang->where('status', 5);
         $transaksi = $keranjang->first();
         if (!$transaksi){
             session()->setFlashdata('error', 'Transaksi tidak ditemukan');
@@ -546,8 +561,9 @@ class order extends BaseController
     public function transaksibermasalah($id = 0)
     {
         $keranjang = $this->keranjang;
-        $keranjang->where('keranjang.id', $id);
-        $keranjang->where('keranjang.buyer', user()->id);
+        $keranjang->where('id', $id);
+        $keranjang->where('buyer', user()->id);
+        $keranjang->where('status', 5);
         $transaksi = $keranjang->first();
         if (!$transaksi){
             session()->setFlashdata('error', 'Transaksi tidak ditemukan');

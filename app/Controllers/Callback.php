@@ -74,7 +74,7 @@ class Callback extends BaseController
             $keranjang = $keranjang->findAll();
 //        return $this->respond($keranjang, 200);
             foreach ($keranjang as $k) {
-                $produk = $this->produk->where('id', $k['id'])->first();
+                $produk = $this->produk->where('id', $k['produk'])->first();
                 $stok = $produk['stok'];
                 if ($stok >= 1) {
                     $kid = $k['id'];

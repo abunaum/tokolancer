@@ -64,7 +64,6 @@
                                                 <button type="button" class="btn btn-success unbanned-one" style="width: 100%;" data-nama="<?= $t['toko']['username'] ?>">Unbanned
                                                 </button>
                                             </form>
-
                                         <?php endif;?>
                                     </td>
                                 </tr>

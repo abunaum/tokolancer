@@ -6,7 +6,6 @@ use App\Controllers\BaseController;
 
 class Admin extends BaseController
 {
-    public $telelib;
     public function __construct()
     {
         helper(['role','tele']);
@@ -109,6 +108,14 @@ class Admin extends BaseController
 
     public function subitem()
     {
+        $perpage = 10;
+        $page = $this->request->getVar('page_subitem');
+        if(!$page){
+            $hal = 1;
+        } else {
+            $hal = $page;
+        }
+        $start = ($hal - 1) * $perpage;
         $subitem = $this->subitem->orderBy('nama', 'asc');
         $item = $this->item->orderBy('nama', 'asc');
         $item = $item->where('status', 1);
@@ -117,8 +124,9 @@ class Admin extends BaseController
             'namaweb' => $this->namaweb,
             'judul' => "Admin SubItem | $this->namaweb",
             'itemlist' => $item->findAll(),
+            'start' => $start,
             'validation' => \Config\Services::validation(),
-            'subitem' => $subitem->paginate(10,'subitem'),
+            'subitem' => $subitem->paginate($perpage,'subitem'),
             'pager' => $subitem->pager
         ];
         // dd($item);

@@ -44,6 +44,10 @@ class Auth implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        //
+        if (user()->status == 0)
+        {
+            session()->destroy();
+            return redirect()->to(base_url());
+        }
     }
 }

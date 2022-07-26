@@ -14,7 +14,8 @@
                 <!-- Page Heading -->
                 <center>
                     <div class="mb-3">
-                        <h1>List Toko</h1>
+                        <h1>List Produk</h1>
+                        <hr style="border-top: 2px dashed green;">
                     </div>
                     <div style="overflow-x:auto;">
                         <table id="produk" class="table table-striped table-bordered" style="width:100%">

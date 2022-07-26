@@ -53,6 +53,10 @@ class Auth extends BaseController
                 ];
 
                 session()->set($newdata);
+            }
+            if ($getuser['status'] == 0){
+                session()->setFlashdata('error', 'User '.$getuser['email'].' telah di banned!!');
+                return redirect()->to(base_url());
             } else {
                 $user->update($getuser['id'],[
                     'gauthid' => $data['id'],

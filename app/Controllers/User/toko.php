@@ -72,7 +72,9 @@ class toko extends BaseController
         $stok = $this->request->getVar('stok');
 
         $toko = $this->toko->where('userid', user()->id)->get()->getFirstRow();
-        $slug = url_title($toko->username . ' ' . $nama);
+        $jenis = $this->subitem->where('id',$subitem)->first();
+        $kategori = $this->item->where('id',$jenis['item'])->first();
+        $slug = url_title($toko->username .' ' .$jenis['nama'].' '.$kategori['nama'].' ' . $nama);
 
         if (!$this->validate([
             'item' => 'required',
@@ -160,14 +162,24 @@ class toko extends BaseController
 
     public function hapusproduk($id = 0)
     {
+        $prev = str_replace('index.php/', '',previous_url());
         $produk = $this->produk->where('id', $id)->get()->getFirstRow();
         if (!$produk){
             session()->setFlashdata('error', 'Produk tidak ditemukan');
-            return redirect()->to(base_url('toko'));
+            return redirect()->to($prev);
+        }
+        $keranjang = $this->keranjang;
+        $keranjang->where('status', 3);
+        $keranjang->orwhere('status', 5);
+        $keranjang->where('produk', $produk->id);
+        $keranjang = $keranjang->first();
+        if ($keranjang){
+            session()->setFlashdata('error', 'Gagal menghapus produk, masih ada transaksi berlangsung');
+            return redirect()->to($prev);
         }
         if ($produk->owner != user()->id) {
             session()->setFlashdata('error', 'Produk tidak ditemukan');
-            return redirect()->to(base_url('toko'));
+            return redirect()->to($prev);
         } else {
             $this->produk->delete($id);
             session()->setFlashdata('pesan', 'Produk Berhasil di hapus');
@@ -176,9 +188,23 @@ class toko extends BaseController
     }
     public function editproduk($id)
     {
-        $produk = $this->produk->find($id);
+        $prev = str_replace('index.php/', '',previous_url());
+        $produk = $this->produk->where('id', $id)->first();
         if ($produk['owner'] != user()->id) {
             return redirect()->to(base_url('user/toko/produk'));
+        }
+        $keranjang = $this->keranjang;
+        $keranjang->where('status', 3);
+        $keranjang->orwhere('status', 5);
+        $keranjang->where('produk', $produk->id);
+        $keranjang = $keranjang->first();
+        if ($keranjang){
+            session()->setFlashdata('error', 'Gagal mengedit produk, masih ada transaksi berlangsung');
+            return redirect()->to($prev);
+        }
+        if (!$produk){
+        session()->setFlashdata('error', 'Produk tidak ditemukan');
+        return redirect()->to($prev);
         }
         $file = $this->request->getFiles();
         $gambar = $file['gambar'];
@@ -322,7 +348,6 @@ class toko extends BaseController
         $pesanan->where('keranjang.status', 3);
         $pesanan->where('produk.owner', user()->id);
         $pesanan = $pesanan->first();
-//        dd($pesanan);
         if (!$pesanan){
             session()->setFlashdata('error', 'Pesanan tidak ditemukan');
             return redirect()->to(base_url('user/toko/transaksi'));
@@ -330,7 +355,7 @@ class toko extends BaseController
         $this->keranjang->update(
             $id,
             [
-                'pesan' => 'Dana dikembalikan ke saldo anda',
+                'pesan' => 'Dana dikembalikan',
                 'status' => 4
             ]
         );

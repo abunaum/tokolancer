@@ -39,7 +39,7 @@ $routes->group('auth', function ($routes) {
     $routes->get('cek', 'Auth::cek');
 });
 
-$routes->post('api/proses/gasspol/mantap/callback', 'Callback::callback');
+$routes->post('console/callback', 'Callback::callback');
 
 $routes->get('produk/detail/(:num)', 'Home::produkdetail/$1');
 $routes->group('admin',["filter" => "auth"], function ($routes) {
@@ -71,7 +71,8 @@ $routes->group('admin',["filter" => "auth"], function ($routes) {
     });
     $routes->group('user', function ($routes) {
         $routes->get('', 'Admin\User::index');
-        $routes->post('(:num)', 'Admin\User::detail/$1');
+        $routes->post('disable/(:num)', 'Admin\User::disable/$1');
+        $routes->post('enable/(:num)', 'Admin\User::enable/$1');
     });
     $routes->group('toko', function ($routes) {
         $routes->get('pengajuan', 'Admin\Toko::pengajuan');
@@ -88,12 +89,15 @@ $routes->group('admin',["filter" => "auth"], function ($routes) {
         $routes->get('seller', 'Admin\Toko::pencairan_seller');
         $routes->post('acc/(:num)', 'Admin\Toko::pencairanacc/$1');
         $routes->post('tolak/(:num)', 'Admin\Toko::pencairantolak/$1');
-        $routes->get('riwayat', 'Admin\Toko::riwayat');
+        $routes->get('riwayat', 'Admin\Toko::riwayat_pencairan');
     });
     $routes->group('transaksi', function ($routes) {
         $routes->get('berlangsung', 'Admin\Transaksi::berlangsung');
+        $routes->post('batalkan/(:num)', 'Admin\Transaksi::batalkan/$1');
+        $routes->post('konfirmasi/(:num)', 'Admin\Transaksi::konfirmasi/$1');
         $routes->get('selesai', 'Admin\Transaksi::selesai');
         $routes->get('bermasalah', 'Admin\Transaksi::bermasalah');
+        $routes->post('refund/(:num)', 'Admin\Transaksi::refund/$1');
     });
 });
 $routes->group('toko', ['filter' => 'auth'], function ($routes) {
