@@ -99,6 +99,11 @@ $routes->group('admin',["filter" => "auth"], function ($routes) {
         $routes->get('bermasalah', 'Admin\Transaksi::bermasalah');
         $routes->post('refund/(:num)', 'Admin\Transaksi::refund/$1');
     });
+    $routes->group('setting', function ($routes) {
+        $routes->get('/', 'Admin\Setting::index');
+        $routes->post('gauth', 'Admin\Setting::gauth');
+        $routes->post('penghasilan', 'Admin\Setting::penghasilan');
+    });
 });
 $routes->group('toko', ['filter' => 'auth'], function ($routes) {
     $routes->get('', 'Toko\Fitur::index');

@@ -1,23 +1,23 @@
 {
-    "gauth": {
-        "id": "349128826147-2p1h1a39uosh5mpr9r77i225uqt87b04.apps.googleusercontent.com",
-        "secret": "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"
-    },
-    "payment": {
-        "apikey": "DEV-hIvWW2APKrWpEO68PXC4LWKhU3h4oBui23eJNJIr",
-        "apiprivatekey": "qLlfi-VMwzL-nXVl0-bFPpa-bt6YS",
-        "urlpaymentchannel": "https://payment.tripay.co.id/api-sandbox/merchant/payment-channel",
-        "urlfeekalkulator": "https://payment.tripay.co.id/api-sandbox/merchant/fee-calculator?",
-        "urlcreatepayment": "https://payment.tripay.co.id/api-sandbox/transaction/create",
-        "urldetailtransaksi": "https://payment.tripay.co.id/api-sandbox/transaction/detail?",
-        "kodemerchant": "T1438",
-        "callback": "api/proses/gasspol/mantap/callback"
-    },
-    "feemc": {
-        "percent" : 5
-    },
-    "cair": {
-        "minimal" : 50000,
-        "fee" : 4500
-    }
+  "gauth": {
+    "id": "349128826147-2p1h1a39uosh5mpr9r77i225uqt87b04.apps.googleusercontent.com",
+    "secret": "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"
+  },
+  "payment": {
+    "apikey": "DEV-hIvWW2APKrWpEO68PXC4LWKhU3h4oBui23eJNJIr",
+    "apiprivatekey": "qLlfi-VMwzL-nXVl0-bFPpa-bt6YS",
+    "urlpaymentchannel": "https:\/\/payment.tripay.co.id\/api-sandbox\/merchant\/payment-channel",
+    "urlfeekalkulator": "https:\/\/payment.tripay.co.id\/api-sandbox\/merchant\/fee-calculator?",
+    "urlcreatepayment": "https:\/\/payment.tripay.co.id\/api-sandbox\/transaction\/create",
+    "urldetailtransaksi": "https:\/\/payment.tripay.co.id\/api-sandbox\/transaction\/detail?",
+    "kodemerchant": "T1438",
+    "callback": "console\/callback"
+  },
+  "feemc": {
+    "percent": "5"
+  },
+  "cair": {
+    "minimal": "50000",
+    "fee": "4500"
+  }
 }
