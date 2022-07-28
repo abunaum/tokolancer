@@ -19,10 +19,11 @@ class toko extends BaseController
 
     public function produk()
     {
+        $perpage = 10;
         $item = $this->getitem->getsub();
         $toko = $this->toko;
         $user = $this->users->where('id', user()->id)->get()->getFirstRow();
-        $produkuser = $this->produk->where('owner', user()->id);
+        $produkuser = $this->produk->orderBy('nama', 'asc')->where('owner', user()->id);
         // dd($produkuser->findAll());
 
         $data = [
@@ -31,7 +32,7 @@ class toko extends BaseController
             'toko' => $toko->where('userid', user()->id)->get()->getFirstRow(),
             'user' => $user,
             'validation' => \Config\Services::validation(),
-            'produk' => $produkuser->paginate(6),
+            'produk' => $produkuser->paginate($perpage,'produk'),
             'pager' => $produkuser->pager,
         ];
         if ($user->status_toko != 4) {

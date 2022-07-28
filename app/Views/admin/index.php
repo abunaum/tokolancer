@@ -4,10 +4,10 @@
 <div class="main-content">
     <div class="section__content section__content--p30">
         <div class="container-fluid">
-
             <!-- Page Heading -->
-            <h1 class="h3 mb-4 text-gray-800">Hello World</h1>
-
+            <center>
+            <h1 class="h3 mb-4 text-gray-800">Selamat Datang Di <?= $namaweb; ?></h1>
+            </center>
         </div>
     </div>
 </div>

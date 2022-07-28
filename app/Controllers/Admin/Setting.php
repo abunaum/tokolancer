@@ -52,6 +52,52 @@ class Setting extends BaseController
         session()->setFlashdata('pesan', 'berhasil edit Gauth');
         return redirect()->to(base_url('admin/setting'));
     }
+
+    public function payment()
+    {
+        if (!$this->validate([
+            'apikey' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'API Key harus di isi'
+                ]
+            ],
+            'apiprivatekey' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'API Private Key harus di isi'
+                ]
+            ],
+            'kodemerchant' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'Kode Merchant harus di isi'
+                ]
+            ],
+        ])) {
+            session()->setFlashdata('error', 'Gagal edit Payment');
+            return redirect()->to(base_url('admin/setting'))->withInput();
+        }
+        $merchant = $this->request->getVar('merchant');
+        $urlpaymentchannel = "https://payment.tripay.co.id/$merchant/merchant/payment-channel";
+        $urlfeekalkulator = "https://payment.tripay.co.id/$merchant/merchant/fee-calculator?";
+        $urlcreatepayment = "https://payment.tripay.co.id/$merchant/transaction/create";
+        $urldetailtransaksi = "https://payment.tripay.co.id/$merchant/transaction/detail?";
+
+        $config = ambilconfig();
+        $config['payment']['apikey'] = $this->request->getVar('apikey');
+        $config['payment']['apiprivatekey'] = $this->request->getVar('apiprivatekey');
+        $config['payment']['urlpaymentchannel'] = $urlpaymentchannel;
+        $config['payment']['urlfeekalkulator'] = $urlfeekalkulator;
+        $config['payment']['urlcreatepayment'] = $urlcreatepayment;
+        $config['payment']['urldetailtransaksi'] = $urldetailtransaksi;
+        $config['payment']['kodemerchant'] = $this->request->getVar('kodemerchant');
+        $newconfig = json_encode($config,true);
+        file_put_contents(ROOTPATH . 'config.json', $newconfig);
+        session()->setFlashdata('pesan', 'berhasil edit Payment');
+        return redirect()->to(base_url('admin/setting'));
+    }
+
     public function penghasilan()
     {
 

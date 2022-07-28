@@ -17,13 +17,16 @@
                                 </span>
                                 <h2 class="woocommerce-loop-product__title"><?= $p['nama']; ?></h2>
                             </a>
-                            <div class="hover-area d-flex justify-content-center">
-                                <form action="<?= base_url('user/toko/produk/hapus') . '/' . $p['id'] ?>" method="post">
+                            <div class="mt-3 flex-row justify-content-center">
+                                <a class="button" href="<?= base_url('user/toko/produk/detail') . '/' . $p['id'] ?>">Detail</a>
+                                <form action="<?= base_url('user/toko/produk/hapus') . '/' . $p['id'] ?>" method="post" id="hapus-<?= $p['id'] ;?>">
+                                    <?php $id = $p['id'] ;?>
+                                    <?php $data = $p['nama'] ;?>
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="_method" value="DELETE" />
-                                    <button type="button" class="button tmbl-hps">
+                                    <a class="button" onclick="hapus('<?= $id;?>','<?= $data;?>')">
                                         Hapus
-                                    </button>
+                                    </a>
                                 </form>
                             </div>
                         </div>
@@ -31,7 +34,31 @@
                 </div>
             </div>
         </div>
-        <?= $pager->links(); ?>
+        <?= $pager->links('produk','halaman'); ?>
     </div>
 </section>
+<?= $this->endSection(); ?>
+
+<?= $this->section('script'); ?>
+<script>
+    function hapus(id,data){
+        formnya = document.getElementById('hapus-'+id);
+        nama = data;
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: 'Mau menghapus produk ' + nama + ' ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                formnya.submit();
+            }
+        })
+    }
+</script>
+
 <?= $this->endSection(); ?>

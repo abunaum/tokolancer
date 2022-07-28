@@ -151,17 +151,38 @@
                     <form action="<?= base_url('admin/setting/payment'); ?>" method="post">
                         <?= csrf_field(); ?>
                         <div class="form-group row">
-                            <label for="id" class="col-sm-3 col-form-label">ID</label>
+                            <label for="apikey" class="col-sm-3 col-form-label">API Key</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="id" aria-describedby="idhelp" placeholder="ID" name="id" value="<?= $config['gauth']['id']; ?>">
-                                <small id="idhelp" class="form-tex" style="color:red;"><?= $validation->getError('id'); ?></small>
+                                <input type="text" class="form-control" id="apikey" aria-describedby="apikeyhelp" placeholder="API Key" name="apikey" value="<?= $config['payment']['apikey']; ?>">
+                                <small id="idhelp" class="form-tex" style="color:red;"><?= $validation->getError('apikey'); ?></small>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="secret" class="col-sm-3 col-form-label">Secret</label>
+                            <label for="apiprivatekey" class="col-sm-3 col-form-label">Private Key</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="secret" aria-describedby="secrethelp" placeholder="Secret Key" name="secret" value="<?= $config['gauth']['secret']; ?>">
-                                <small id="secrethelp" class="form-tex" style="color:red;"><?= $validation->getError('secret'); ?></small>
+                                <input type="text" class="form-control" id="apiprivatekey" aria-describedby="apiprivatekeyhelp" placeholder="Private Key" name="apiprivatekey" value="<?= $config['payment']['apiprivatekey']; ?>">
+                                <small id="apiprivatekeyhelp" class="form-tex" style="color:red;"><?= $validation->getError('apiprivatekey'); ?></small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="kodemerchant" class="col-sm-3 col-form-label">Kode Merchant</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="kodemerchant" aria-describedby="kodemerchanthelp" placeholder="Kode Merchant" name="kodemerchant" value="<?= $config['payment']['kodemerchant']; ?>">
+                                <small id="kodemerchanthelp" class="form-tex" style="color:red;"><?= $validation->getError('kodemerchant'); ?></small>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="merchant" class="col-sm-3 col-form-label">Merchant</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" id="merchant" name="merchant">
+                                    <?php if ($merchant == 'Sandbox'): ?>
+                                        <option value="api-sandbox">Sandbox</option>
+                                        <option value="api">Real Merchant</option>
+                                    <?php else : ?>
+                                        <option value="api">Real Merchant</option>
+                                        <option value="api-sandbox">Sandbox</option>
+                                    <?php endif; ?>
+                                </select>
                             </div>
                         </div>
                         <center>

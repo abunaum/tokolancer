@@ -102,6 +102,7 @@ $routes->group('admin',["filter" => "auth"], function ($routes) {
     $routes->group('setting', function ($routes) {
         $routes->get('/', 'Admin\Setting::index');
         $routes->post('gauth', 'Admin\Setting::gauth');
+        $routes->post('payment', 'Admin\Setting::payment');
         $routes->post('penghasilan', 'Admin\Setting::penghasilan');
     });
 });
