@@ -20,6 +20,36 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="<?= base_url('user/notifikasi'); ?>">
+                                    Notifikasi
+                                </a>
+                                <hr>
+                                <a class="dropdown-item" href="<?= base_url('user/order/keranjang'); ?>">
+                                    <?php
+                                    $keranjang = new \App\Models\Keranjang();
+                                    $keranjang->where('buyer', user()->id);
+                                    $keranjang->where('status', 1);
+                                    $totalkeranjang = $keranjang->countAllResults();
+                                    ?>
+                                    <?php if ($totalkeranjang >= 1) : ?>
+                                        Keranjang ( <?= $totalkeranjang ?> )
+                                    <?php else : ?>
+                                        Keranjang
+                                    <?php endif; ?>
+                                </a>
+                                <hr>
+                                <a class="dropdown-item" href="<?= base_url('user/order/transaksi'); ?>">
+                                    Invoice
+                                </a>
+                                <hr>
+                                <a class="dropdown-item" href="<?= base_url('toko'); ?>">
+                                    Toko
+                                </a>
+                                <hr>
+                                <a class="dropdown-item">
+                                    Saldo Rp. <?= number_format(user()->balance) ?>
+                                </a>
+                                <hr>
                                 <a class="dropdown-item" href="<?= base_url('logout'); ?>">
                                     Logout
                                 </a>
@@ -57,99 +87,39 @@
                         <span class="iconify" data-icon="ep:menu" data-width="32" data-height="32"></span>
                     </button>
                     <div class="handheld-navigation-menu">
-                        <ul id="menu-departments-menu-1" class="nav row">
-                            <li class="menu-item menu-item-has-children animate-dropdown dropdown-submenu">
-                                <a title="Produk" data-toggle="dropdown" class="dropdown-toggle" aria-haspopup="true" href="#">Produk<span
-                                            class="caret"></span>
-                                </a>
-                                <ul id="menu" class="dropdown-menu">
-                                    <?php foreach ($item as $i) : ?>
-                                        <li class="menu-item menu-item-has-children animate-dropdown dropdown-submenu">
-                                            <a title="<?= $i['namaitem']; ?>" data-toggle="dropdown" class="dropdown-toggle"
-                                               aria-haspopup="true" href="#"><?= $i['namaitem']; ?><span class="caret"></span></a>
-                                            <ul role="menu" class="dropdown-menu">
-                                                <li class="menu-item menu-item-object-static_block animate-dropdown">
-                                                    <div class="yamm-content">
-                                                        <div class="bg-yamm-content bg-yamm-content-bottom bg-yamm-content-right">
-                                                            <div class="kc-col-container">
-                                                                <div class="kc_single_image">
-                                                                    <img src="<?= base_url(); ?>/tokolancer.ico" class="" alt=""/>
-                                                                </div>
-                                                                <!-- .kc_single_image -->
-                                                            </div>
-                                                            <!-- .kc-col-container -->
-                                                        </div>
-                                                        <?php $nama = $i['namaitem']; ?>
-                                                        <?php foreach ($i[$nama] as $s) : ?>
-                                                            <ul>
-                                                                <li>
-                                                                    <a href="<?= base_url('jenis') . '/' . $s['id']; ?>"><?= $s['nama']; ?></a>
-                                                                </li>
-                                                            </ul>
-                                                        <?php endforeach; ?>
-                                                        <!-- .kc_row -->
-                                                    </div>
-                                                    <!-- .yamm-content -->
-                                                </li>
-                                            </ul>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </li>
-                        </ul>
-                        <?php if (cek_login() == true) : ?>
-                            <hr>
+                        <a href="<?= base_url(); ?>">
+                            <div class="yamm-content">
+                                <div class="bg-yamm-content bg-yamm-content-bottom bg-yamm-content-right">
+                                    <div class="kc-col-container">
+                                        <div class="kc_single_image">
+                                            <img src="<?= base_url(); ?>/logotoko.png" alt=""/>
+                                        </div>
+                                        <!-- .kc_single_image -->
+                                    </div>
+                                    <hr>
+                                    <!-- .kc-col-container -->
+                                </div>
+                            </div>
+                        </a>
+                        <?php foreach ($item as $i) : ?>
                             <ul id="menu-departments-menu-1" class="nav row">
                                 <li class="menu-item menu-item-has-children animate-dropdown dropdown-submenu">
-                                    <a title="Toko" data-toggle="dropdown" class="dropdown-toggle" aria-haspopup="true" href="#">User<span
+                                    <a title="Toko" data-toggle="dropdown" class="dropdown-toggle" aria-haspopup="true"
+                                       href="#"><?= $i['namaitem']; ?><span
                                                 class="caret"></span>
                                     </a>
                                     <ul role="menu" class="dropdown-menu">
                                         <li class="menu-item menu-item-object-static_block animate-dropdown">
                                             <div class="yamm-content">
-                                                <div class="bg-yamm-content bg-yamm-content-bottom bg-yamm-content-right">
-                                                    <div class="kc-col-container">
-                                                        <div class="kc_single_image">
-                                                            <img src="<?= base_url(); ?>/tokolancer.ico" class="" alt=""/>
-                                                        </div>
-                                                        <!-- .kc_single_image -->
-                                                    </div>
-                                                    <!-- .kc-col-container -->
-                                                </div>
                                                 <ul>
-                                                    <li>
-                                                        <a href="<?= base_url('user/notifikasi'); ?>">
-                                                            Notifikasi
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="<?= base_url('user/order/keranjang'); ?>">
-                                                            <?php
-                                                            $keranjang = new \App\Models\Keranjang();
-                                                            $keranjang->where('buyer', user()->id);
-                                                            $keranjang->where('status', 1);
-                                                            $totalkeranjang = $keranjang->countAllResults();
-                                                            ?>
-                                                            <?php if ($totalkeranjang >= 1) : ?>
-                                                                Keranjang ( <?= $totalkeranjang ?> )
-                                                            <?php else :?>
-                                                                Keranjang
-                                                            <?php endif; ?>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="<?= base_url('user/order/transaksi'); ?>">
-                                                            Invoice
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="<?= base_url('toko'); ?>">
-                                                            Toko
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        Saldo Rp. <?= number_format(user()->balance) ?>
-                                                    </li>
+                                                    <?php $nama = $i['namaitem']; ?>
+                                                    <?php foreach ($i[$nama] as $s) : ?>
+                                                        <li>
+                                                            <a href="<?= base_url('jenis') . '/' . $s['id']; ?>">
+                                                                <?= $s['nama']; ?>
+                                                            </a>
+                                                        </li>
+                                                    <?php endforeach; ?>
                                                 </ul>
                                                 <!-- .kc_row -->
                                             </div>
@@ -158,7 +128,7 @@
                                     </ul>
                                 </li>
                             </ul>
-                        <?php endif; ?>
+                        <?php endforeach; ?>
                         <hr>
                     </div>
                     <!-- .handheld-navigation-menu -->
