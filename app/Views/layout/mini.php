@@ -131,7 +131,7 @@
                                                             $totalkeranjang = $keranjang->countAllResults();
                                                             ?>
                                                             <?php if ($totalkeranjang >= 1) : ?>
-                                                                Keranjang (<?= $totalkeranjang ?>)
+                                                                Keranjang ( <?= $totalkeranjang ?> )
                                                             <?php else :?>
                                                                 Keranjang
                                                             <?php endif; ?>
