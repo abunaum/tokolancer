@@ -88,7 +88,7 @@
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="saldoDropdown">
                             <ul class="site-header-cart">
                                 <li class="animate-dropdown dropdown">
-                                    <a class="cart-contents" title="Saldo Anda" href="<?= base_url('user/saldo') ?>">
+                                    <a class="cart-contents" title="Saldo Anda">
                                         <span class="amount">
                                             <span class="price-label">Saldo</span>
                                             Rp. <?= number_format(user()->balance) ?>
@@ -105,9 +105,6 @@
                             <img src="<?= user()->user_image; ?>" width="30" height="30" class="rounded-circle" alt="Profile">
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="<?= base_url('user/profile'); ?>">
-                                Profile
-                            </a>
                             <a class="dropdown-item" href="<?= base_url('logout'); ?>">
                                 Logout
                             </a>
@@ -120,7 +117,7 @@
                     <li class="nav-item">
                         <a href="<?= base_url('login') ?>" class="has-icon">
                             <span class="iconify" data-icon="ant-design:login-outlined" data-inline="false" data-width="24" data-height="24"></span>
-                            <span class="value">Login / Register </span>
+                            <span class="value">Login</span>
                         </a>
                     </li>
                 </ul>

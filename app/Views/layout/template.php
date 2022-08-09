@@ -78,15 +78,16 @@
     <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/js/swal2/sweetalert2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/abunaum/naum-market-css-js@master/js/swal2/swall.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UpUp/1.1.0/upup.min.js"></script>
     <?= $this->renderSection('script'); ?>
-    <script src="<?= base_url('upup.min.js') ?>"></script>
     <script>
-        UpUp.start({
+        configg = {
             'cache-version': 'v2',
             'content-url': '<?= current_url() ?>',
-            'content': 'Gagal terhubung ke website, silahkan cek koneksi internet.',
+            'content': '<html><body><p>Anda sedang offline</p><p>Silahkan cek koneksi internet anda</p></body></html>',
             'service-worker-url': '<?= base_url('upup.sw.min.js') ?>'
-        });
+        };
+        UpUp.start(configg);
     </script>
 </body>
 

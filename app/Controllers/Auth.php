@@ -53,22 +53,23 @@ class Auth extends BaseController
                 ];
 
                 session()->set($newdata);
-            }
-            if ($getuser['status'] == 0){
-                session()->setFlashdata('error', 'User '.$getuser['email'].' telah di banned!!');
-                return redirect()->to(base_url());
             } else {
-                $user->update($getuser['id'],[
-                    'gauthid' => $data['id'],
-                    'fullname' => $data['name'],
-                    'user_image' => $data['picture']
-                ]);
-                $newdata = [
-                    'id' => $getuser['id'],
-                    'logged_in' => true,
-                ];
+                if ($getuser['status'] == 0){
+                    session()->setFlashdata('error', 'User '.$getuser['email'].' telah di banned!!');
+                    return redirect()->to(base_url());
+                } else {
+                    $user->update($getuser['id'], [
+                        'gauthid' => $data['id'],
+                        'fullname' => $data['name'],
+                        'user_image' => $data['picture']
+                    ]);
+                    $newdata = [
+                        'id' => $getuser['id'],
+                        'logged_in' => true,
+                    ];
 
-                session()->set($newdata);
+                    session()->set($newdata);
+                }
             }
             if (session('url')){
                 $redirect = session('url');
